@@ -4,8 +4,8 @@ public class LinkedList<E> {
 
     private class Node {
 
-        Node next;
-        E data;
+        private Node next;
+        private E data;
 
         public Node(E data) {
             this.data = data;
