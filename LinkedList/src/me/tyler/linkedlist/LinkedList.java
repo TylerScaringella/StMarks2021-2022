@@ -2,12 +2,10 @@ package me.tyler.linkedlist;
 
 public class LinkedList<E> {
 
-    private int size;
-
     private class Node {
 
-        private Node next;
-        private E data;
+        Node next;
+        E data;
 
         public Node(E data) {
             this.data = data;
@@ -16,6 +14,7 @@ public class LinkedList<E> {
     }
 
     private Node first;
+    private int size;
 
     public void add(E info) {
         this.add(info, this.size());
@@ -26,24 +25,24 @@ public class LinkedList<E> {
 
         if(this.first == null) {
             this.first = node;
+            this.size++;
+            return;
         }
 
         if(i == 0) {
             node.next = this.first;
             this.first = node;
+            this.size++;
+            return;
         }
 
         try {
-            Node curr = first;
-            for(int x = 0; x < i; x++) {
-                curr = curr.next;
+            Node prev = this.get(i-1);
+            if (i < this.size) {
+                node.next = prev.next;
             }
-
-            node.next = curr.next;
-            curr.next = node;
-
+            prev.next = node;
             this.size++;
-
         } catch(NullPointerException e) {
             throw new IndexOutOfBoundsException();
         }
@@ -51,7 +50,7 @@ public class LinkedList<E> {
 
     public Node get(int index) {
         Node curr = this.first;
-        for(int i = 0; i <= index; i++) {
+        for(int i = 0; i < index; i++) {
             curr = curr.next;
         }
 
@@ -59,18 +58,13 @@ public class LinkedList<E> {
     }
 
     public void remove(int i) {
-        Node prevRemoval = null, curr = this.first;
-        for(int x = 0; x < i; x++) {
-            curr = curr.next;
+        Node previous = this.get(i-1);
 
-            if(x == (i-1)) {
-                    prevRemoval = curr;
-            }
-        }
+        if(previous == this.first) this.first = this.first.next;
 
-        if(prevRemoval == null) throw new ArrayIndexOutOfBoundsException();
+        if(previous == null) throw new ArrayIndexOutOfBoundsException();
+        if(previous.next != null) previous.next = previous.next.next;
 
-        prevRemoval.next = prevRemoval.next.next;
         this.size--;
     }
 
@@ -80,8 +74,8 @@ public class LinkedList<E> {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for(int i=0; i<this.size; i++) {
-            sb.append(this.get(i).data + ", ");
+        for(int i=0; i < this.size; i++) {
+            sb.append(i + ". " + this.get(i).data + "\n");
         }
 
         return sb.toString();
