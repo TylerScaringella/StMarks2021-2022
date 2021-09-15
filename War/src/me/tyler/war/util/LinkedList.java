@@ -1,4 +1,4 @@
-package me.tyler.linkedlist;
+package me.tyler.war.util;
 
 public class LinkedList<E> {
 
@@ -37,7 +37,7 @@ public class LinkedList<E> {
         }
 
         try {
-            Node prev = this.get(i-1);
+            Node prev = this.getNode(i-1);
             if (i < this.size) {
                 node.next = prev.next;
             }
@@ -48,7 +48,7 @@ public class LinkedList<E> {
         }
     }
 
-    public Node get(int index) {
+    private Node getNode(int index) {
         Node curr = this.first;
         for(int i = 0; i < index; i++) {
             curr = curr.next;
@@ -57,8 +57,18 @@ public class LinkedList<E> {
         return curr;
     }
 
-    public void remove(int i) {
-        Node previous = this.get(i-1);
+    public E get(int index) {
+        Node curr = this.first;
+        for(int i = 0; i < index; i++) {
+            curr = curr.next;
+        }
+
+        return curr.data;
+    }
+
+    public E remove(int i) {
+        Node previous = this.getNode((i == 0 ? 1 : i-1));
+        Node removal = previous.next;
 
         if(previous == this.first) this.first = this.first.next;
 
@@ -66,6 +76,7 @@ public class LinkedList<E> {
         if(previous.next != null) previous.next = previous.next.next;
 
         this.size--;
+        return removal.data;
     }
 
     public int size() {
@@ -75,7 +86,7 @@ public class LinkedList<E> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for(int i=0; i < this.size; i++) {
-            sb.append(i + ". " + this.get(i).data + "\n");
+            sb.append(i + ". " + this.getNode(i).data + "\n");
         }
 
         return sb.toString();
