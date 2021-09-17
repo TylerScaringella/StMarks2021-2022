@@ -116,6 +116,11 @@ public class War {
     private void handleWar(List<Card> ogCards) {
         List<Card> cards = new ArrayList<>(ogCards);
 
+        for(int i=0; i<3; i++) {
+            cards.add(this.handleCard(this.playerOne));
+            cards.add(this.handleCard(this.playerTwo));
+        }
+
         Card playerOneCard = this.handleCard(this.playerOne);
         Card playerTwoCard = this.handleCard(this.playerTwo);
 
@@ -139,10 +144,6 @@ public class War {
 
     private Card handleCard(LinkedList<Card> linkedList) {
         return linkedList.remove(1);
-    }
-
-    private void handleGameWinner() {
-
     }
 
     public static War getInstance() {
