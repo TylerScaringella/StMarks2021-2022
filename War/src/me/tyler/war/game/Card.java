@@ -17,4 +17,9 @@ public class Card {
     public int getNumber() {
         return this.number;
     }
+
+    @Override
+    public String toString() {
+        return number + " of " + suit;
+    }
 }

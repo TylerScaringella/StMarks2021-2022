@@ -13,7 +13,7 @@ public class War {
 
     private static War instance;
 
-    private final LinkedList<Card> gameDeck, playerOne, playerTwo;
+    private LinkedList<Card> gameDeck, playerOne, playerTwo;
     private final Scanner scanner;
 
     public War() {
@@ -54,6 +54,7 @@ public class War {
     }
 
     private void shuffleCards() {
+        // randomize cards
         for(int i=0; i<this.gameDeck.size(); i++) {
             Card changingCard = this.gameDeck.get(i);
             this.gameDeck.remove(i);
@@ -61,6 +62,49 @@ public class War {
             int newPosition = ThreadLocalRandom.current().nextInt(0, this.gameDeck.size()-1);
             this.gameDeck.add(changingCard, newPosition);
         }
+
+        // Shuffling algorithm | Not working
+
+        /*
+        // first half
+        LinkedList<Card> firstHalf = new LinkedList<>();
+        for(int i=0; i<26; i++) {
+            Card removingCard = this.gameDeck.remove(1);
+            firstHalf.add(removingCard, i);
+        }
+
+        System.out.println(firstHalf.size());
+
+        System.out.println(this.gameDeck.size());
+
+        LinkedList<Card> secondHalf = new LinkedList<>();
+        for(int i=0; i<25; i++) {
+            Card removingCard = this.gameDeck.remove(0);
+            secondHalf.add(removingCard, i);
+        }
+
+        // combine cards (pack groups together in 1-3)
+
+        while(firstHalf.size() >= 1 || secondHalf.size() >= 1) {
+            // first group
+            int firstTogether = ThreadLocalRandom.current().nextInt(1, 3);
+            for(int i=0; i<firstTogether; i++) {
+                Card addingCard = firstHalf.remove(0);
+                this.gameDeck.add(addingCard);
+            }
+
+            // second group
+            int secondTogether = ThreadLocalRandom.current().nextInt(1, 3);
+            for(int i=0; i<secondTogether; i++) {
+                Card addingCard = secondHalf.remove(0);
+                this.gameDeck.add(addingCard);
+            }
+        }
+
+        for(int i=0; i<this.gameDeck.size(); i++) {
+            System.out.println(this.gameDeck.get(i).getNumber() + " of " + this.gameDeck.get(i).getSuit());
+        }
+        */
     }
 
     private void giveCards() {

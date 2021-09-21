@@ -67,6 +67,10 @@ public class LinkedList<E> {
     }
 
     public E remove(int i) {
+        if(this.size == 1) {
+            this.first = null;
+        }
+
         Node previous = this.getNode((i == 0 ? 1 : i-1));
         Node removal = previous.next;
 
