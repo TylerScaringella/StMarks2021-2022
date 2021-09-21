@@ -47,7 +47,7 @@ public class War {
         // Ace(1)-10, Jack (11), Queen (12), King (13)
 
         for(String suit : suits) {
-            for(int i=1; i<=13; i++) {
+            for(int i=1; i<=5; i++) {
                 this.gameDeck.add(new Card(suit, i));
             }
         }
@@ -137,8 +137,8 @@ public class War {
         Card playerOneCard = this.handleCard(this.playerOne);
         Card playerTwoCard = this.handleCard(this.playerTwo);
 
-        System.out.println("Player 1 plays the " + playerOneCard.getNumber() + " of " + playerOneCard.getSuit());
-        System.out.println("Player 2 plays the " + playerTwoCard.getNumber() + " of " + playerTwoCard.getSuit());
+        System.out.println("Player 1 plays the " + playerOneCard.toString());
+        System.out.println("Player 2 plays the " + playerTwoCard.toString());
         if(playerOneCard.getNumber() == playerTwoCard.getNumber()) {
             System.out.println("War!");
             this.handleWar(Arrays.asList(
@@ -171,8 +171,8 @@ public class War {
         cards.add(playerOneCard);
         cards.add(playerTwoCard);
 
-        System.out.println("Player 1 plays the " + playerOneCard.getNumber() + " of " + playerOneCard.getSuit());
-        System.out.println("Player 2 plays the " + playerTwoCard.getNumber() + " of " + playerTwoCard.getSuit());
+        System.out.println("Player 1 plays the " + playerOneCard.toString());
+        System.out.println("Player 2 plays the " + playerTwoCard.toString());
 
         if(playerOneCard.getNumber() == playerTwoCard.getNumber()) {
             System.out.println("War!");

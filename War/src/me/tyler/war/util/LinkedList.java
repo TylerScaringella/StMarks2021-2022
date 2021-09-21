@@ -72,6 +72,7 @@ public class LinkedList<E> {
         }
 
         Node previous = this.getNode((i == 0 ? 1 : i-1));
+        System.out.println(previous.data);
         Node removal = previous.next;
 
         if(previous == this.first) this.first = this.first.next;
