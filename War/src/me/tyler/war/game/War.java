@@ -1,7 +1,6 @@
 package me.tyler.war.game;
 
 import me.tyler.war.util.LinkedList;
-import sun.awt.image.ImageWatched;
 
 import java.util.ArrayList;
 import java.util.Arrays;
