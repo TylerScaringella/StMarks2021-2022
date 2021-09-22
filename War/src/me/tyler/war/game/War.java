@@ -1,6 +1,7 @@
 package me.tyler.war.game;
 
 import me.tyler.war.util.LinkedList;
+import sun.awt.image.ImageWatched;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +48,7 @@ public class War {
         // Ace(1)-10, Jack (11), Queen (12), King (13)
 
         for(String suit : suits) {
-            for(int i=1; i<=5; i++) {
+            for(int i=1; i<=13; i++) {
                 this.gameDeck.add(new Card(suit, i));
             }
         }
@@ -65,11 +66,11 @@ public class War {
 
         // Shuffling algorithm | Not working
 
-        /*
+
         // first half
         LinkedList<Card> firstHalf = new LinkedList<>();
         for(int i=0; i<26; i++) {
-            Card removingCard = this.gameDeck.remove(1);
+            Card removingCard = this.gameDeck.remove(0);
             firstHalf.add(removingCard, i);
         }
 
@@ -89,22 +90,25 @@ public class War {
             // first group
             int firstTogether = ThreadLocalRandom.current().nextInt(1, 3);
             for(int i=0; i<firstTogether; i++) {
-                Card addingCard = firstHalf.remove(0);
-                this.gameDeck.add(addingCard);
+                if(firstHalf.size() > 0) {
+                    Card addingCard = firstHalf.remove(0);
+                    this.gameDeck.add(addingCard);
+                }
             }
 
             // second group
             int secondTogether = ThreadLocalRandom.current().nextInt(1, 3);
             for(int i=0; i<secondTogether; i++) {
-                Card addingCard = secondHalf.remove(0);
-                this.gameDeck.add(addingCard);
+                if(secondHalf.size() > 0) {
+                    Card addingCard = secondHalf.remove(0);
+                    this.gameDeck.add(addingCard);
+                }
             }
         }
 
         for(int i=0; i<this.gameDeck.size(); i++) {
             System.out.println(this.gameDeck.get(i).getNumber() + " of " + this.gameDeck.get(i).getSuit());
         }
-        */
     }
 
     private void giveCards() {
@@ -121,15 +125,17 @@ public class War {
 
     private void startRounds() {
         AtomicInteger round = new AtomicInteger(1);
-        while(this.playerOne.size() != 0 || this.playerTwo.size() != 0) {
+        while(this.playerOne.size() > 0 || this.playerTwo.size() > 0) {
+            if(this.playerOne.size() == 0 || this.playerTwo.size() == 0) {
+                System.out.println("Player " + (this.playerOne.size() > this.playerTwo.size() ? "1" : "2") + " wins the game!");
+                break;
+            }
             System.out.println("(Round " + round.getAndIncrement() + ") Player 1 has " + this.playerOne.size() + " cards. Player 2 has " + this.playerTwo.size() + " cards.\n");
 
             System.out.println("Press enter to deal cards.");
             this.scanner.nextLine();
             dealRound();
         }
-
-        System.out.println("Player " + (this.playerOne.size() > this.playerTwo.size() ? "1" : "2") + " wins the game!");
     }
 
     private void dealRound() {
@@ -160,9 +166,10 @@ public class War {
     private void handleWar(List<Card> ogCards) {
         List<Card> cards = new ArrayList<>(ogCards);
 
+
         for(int i=0; i<3; i++) {
-            cards.add(this.handleCard(this.playerOne));
-            cards.add(this.handleCard(this.playerTwo));
+            if(this.playerOne.size() > 2) cards.add(this.handleCard(this.playerOne));
+            if(this.playerTwo.size() > 2) cards.add(this.handleCard(this.playerTwo));
         }
 
         Card playerOneCard = this.handleCard(this.playerOne);
@@ -187,7 +194,7 @@ public class War {
     }
 
     private Card handleCard(LinkedList<Card> linkedList) {
-        return linkedList.remove(1);
+        return linkedList.remove(0);
     }
 
     public static War getInstance() {
