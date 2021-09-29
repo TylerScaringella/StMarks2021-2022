@@ -9,10 +9,10 @@ public class Bitcoin {
 
     private final FileWriter writer;
     private final List<Boolean> bitCache;
-    private final List<String> letters;
-    private final Map<String, String> bitDict;
-
-    private int curLetterIndx;
+//    private final List<String> letters;
+//    private final Map<String, String> bitDict;
+//
+//    private int curLetterIndx;
 
     public static void main(String[] args) throws IOException {
         Bitcoin testing = new Bitcoin();
@@ -31,9 +31,9 @@ public class Bitcoin {
     public Bitcoin() throws IOException {
         this.writer = new FileWriter("C:\\Users\\tjsca\\Documents\\cs\\big challenge\\bitcoin.txt");
         this.bitCache = new ArrayList<>();
-        this.bitDict = new HashMap<>();
-        this.letters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
-        this.curLetterIndx = 0;
+//        this.bitDict = new HashMap<>();
+//        this.letters = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z");
+//        this.curLetterIndx = 0;
     }
 
     private void updateBitCache() throws IOException {
