@@ -50,7 +50,7 @@ public class Bitcoin {
 
             int output = Integer.parseInt(bit, 2);
             char bitChar = (char) output;
-            System.out.println("Input: " + bit + " | Output: " + output + " | Char: " + bitChar);
+            System.out.println("Input: " + bit + " | Output: " + output + " | Char: " + bitChar + " | Debug: " + (int) bitChar);
             this.writer.write(bitChar);
         }
     }
@@ -86,9 +86,16 @@ public class Bitcoin {
     }
 
     public void close() throws IOException {
-        for(Boolean bit : this.bitCache) {
-            this.writer.write("|" + bit.toString());
+        this.writer.write("|" + this.bitCache.size());
+        String bit = "";
+        for(int i=0; i<this.bitCache.size(); i++) {
+            bit += (this.bitCache.get(i) ? "1" : 0);
         }
+
+        int finalOutput = Integer.parseInt(bit, 2);
+        char finalChar = (char) finalOutput;
+        System.out.println("Remaining: " + this.bitCache.size() + " | Bit: " + bit + " | Output: " + finalOutput + " | Char: " + finalChar);
+        this.writer.write(finalChar);
         this.writer.close();
     }
 }
