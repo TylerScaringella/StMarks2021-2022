@@ -8,7 +8,7 @@ public class PriorityQueue<E> {
 
     private final List<PriorityData> queue;
 
-    private class PriorityData {
+    public class PriorityData {
         private final E data;
         private final int priority;
 
@@ -39,10 +39,14 @@ public class PriorityQueue<E> {
     }
 
     public E pop() {
+        return this.popData().getData();
+    }
+
+    public PriorityData popData() {
         if(this.size() < 1) throw new IndexOutOfBoundsException();
         PriorityData firstData = this.queue.remove(0);
         this.recalculateSort();
-        return firstData.getData();
+        return firstData;
     }
 
     public PriorityQueue() {

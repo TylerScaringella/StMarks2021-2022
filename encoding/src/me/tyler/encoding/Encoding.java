@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Encoding {
 
-    private final Map<Integer, Character> freqMap;
+    private final Map<Character, Integer> freqMap;
 
     public static void main(String[] args) {
         new Encoding();
@@ -17,10 +17,12 @@ public class Encoding {
         this.freqMap = new HashMap<>();
         try{
             FileReader reader = new FileReader("C:\\Users\\tjsca\\Documents\\cs\\encoding\\read.txt");
-            int index = 0, charNum = -1;
+            int charNum = -1;
             while((charNum = reader.read()) != -1) {
-                this.freqMap.put(index, (char) charNum);
-                index++;
+                char readChar = (char) charNum;
+                int freq = this.freqMap.getOrDefault(readChar, 0);
+                freq++;
+                this.freqMap.put(readChar, freq);
             }
         }catch(IOException ex) {
             ex.printStackTrace();
