@@ -1,6 +1,9 @@
 package me.tyler.snake;
 
 import javax.swing.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Game {
 
@@ -19,6 +22,20 @@ public class Game {
         this.jFrame.setVisible(true);
 
         this.gameState = GameState.RUNNING;
+
+        Runnable runnable = () -> {
+            this.onTick();
+        };
+
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        executor.scheduleAtFixedRate(runnable, 0, 50, TimeUnit.MILLISECONDS);
+    }
+
+    /*
+    Each tick is 1/20 of a second. So 50 milliseconds
+     */
+    public void onTick() {
+        System.out.println("tick");
     }
 
     public GameState getGameState() {
