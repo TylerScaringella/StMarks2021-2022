@@ -1,31 +1,48 @@
 package me.tyler.snake;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
-public class Game {
+public class Game extends JFrame {
 
-    private final JFrame jFrame;
     private GameState gameState;
+    private final JPanel panel;
+    private Snake snake;
+    private boolean ticking;
+    private int score;
+
+    public Game() {
+        this.setTitle("Snake");
+        this.setResizable(false);
+        this.setSize(Constants.WIDTH, Constants.HEIGHT);
+        this.setVisible(true);
+        this.setVisible(true);
+
+        this.panel = new JPanel();
+        add(this.panel);
+
+        this.snake = new Snake();
+        for(int i=0; i<4; i++) {
+            this.snake.addToSnake();
+        }
+
+        this.gameState = GameState.RUNNING;
+
+        startTicking();
+    }
 
     public static void main(String[] args) {
         new Game();
     }
 
-    public Game() {
-        this.jFrame = new JFrame("Snake");
-        this.jFrame.setSize(Constants.WIDTH, Constants.HEIGHT);
-        this.jFrame.setResizable(false);
-        this.jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.jFrame.setVisible(true);
-
-        this.gameState = GameState.RUNNING;
-
-        Runnable runnable = () -> {
-            this.onTick();
-        };
+    private void startTicking() {
+        this.ticking = true;
+        Runnable runnable = this::onTick;
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(runnable, 0, 50, TimeUnit.MILLISECONDS);
@@ -35,7 +52,66 @@ public class Game {
     Each tick is 1/20 of a second. So 50 milliseconds
      */
     public void onTick() {
-        System.out.println("tick");
+        this.repaint();
+    }
+
+    private void drawBackground(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, Constants.WIDTH, Constants.HEIGHT);
+    }
+
+    private void drawSnake(Graphics g) {
+        // draw snake
+        this.snake.getComponents().forEach(component -> {
+            g.setColor(Color.GREEN);
+            g.fillRect(
+                    component.getX(),
+                    component.getY(),
+                    Constants.TILE_WIDTH,
+                    Constants.TILE_WIDTH
+            );
+        });
+
+        // move snake
+        this.snake.moveSnake();
+    }
+
+    private void detectCollision() {
+        Optional<Snake.SnakeComponent> colliding = this.snake.getComponents().stream().filter(component -> component.getX() <= 0 || component.getX() >= Constants.WIDTH || component.getY() <= 0 || component.getY() >= Constants.HEIGHT).findAny();
+        if(colliding.isPresent()) {
+            System.out.println("Collision detected!");
+            setGameState(GameState.STOPPED);
+        }
+    }
+
+    private void drawGameOver(Graphics g) {
+        this.ticking = false;
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        switch (this.gameState) {
+            case RUNNING: {
+                // draw background tiles
+                drawBackground(g);
+                // update snake movement
+                drawSnake(g);
+                // spawn apples
+                // detect collision
+                detectCollision();
+                break;
+            }
+            case STOPPED: {
+                if(ticking)
+                    System.out.println("Game Stopped");
+                    drawGameOver(g);
+                break;
+            }
+            default: {
+                System.out.println("Unexpected error occurred.");
+            }
+        }
     }
 
     public GameState getGameState() {
