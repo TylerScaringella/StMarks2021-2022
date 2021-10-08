@@ -82,6 +82,7 @@ public class Encoding {
             FileWriter writer = new FileWriter(this.codesPath);
             this.codeMap.forEach((character, code) -> {
                 try {
+                    // This will write our codes into our codes.txt file in the format "(char):code:(code)"
                     writer.write(character + ":code:" + code + "\n");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -99,9 +100,10 @@ public class Encoding {
             FileReader reader = new FileReader("C:\\Users\\tjsca\\Documents\\cs\\encoding\\read.txt");
             int charNum = -1;
             while((charNum = reader.read()) != -1) {
-                // With a file reader, the method read returns an in
                 char readChar = (char) charNum;
+                // This will access the code/bits that we have stored from our binary tree
                 String bits = this.codeMap.get(readChar);
+                // Splitting this will allow us to iterate through each individual bit
                 String[] bitSplit = bits.split("");
                 for(String bit : bitSplit) {
                     writer.writeBit(bit.equalsIgnoreCase("1"));
@@ -123,6 +125,7 @@ public class Encoding {
             String line;
 
             while((line = reader.readLine()) != null) {
+                // This right here is reversing our writing for codes.txt |
                 String[] split = line.split(":code:");
                 char character = split[0].toCharArray()[0];
                 String code = split[1];
