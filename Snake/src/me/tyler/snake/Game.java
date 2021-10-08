@@ -2,6 +2,10 @@ package me.tyler.snake;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,6 +29,8 @@ public class Game extends JFrame {
 
         this.panel = new JPanel();
         add(this.panel);
+
+        addKeyListener(new SnakeAdapter());
 
         this.snake = new Snake();
         for(int i=0; i<4; i++) {
@@ -125,5 +131,32 @@ public class Game extends JFrame {
     private enum GameState {
         RUNNING,
         STOPPED
+    }
+
+    private class SnakeAdapter extends KeyAdapter {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            int key = e.getKeyCode();
+
+            switch(key) {
+                case KeyEvent.VK_LEFT: {
+                    snake.setDirection(Snake.SnakeDirection.LEFT);
+                    break;
+                }
+                case KeyEvent.VK_RIGHT: {
+                    snake.setDirection(Snake.SnakeDirection.RIGHT);
+                    break;
+                }
+                case KeyEvent.VK_UP: {
+                    snake.setDirection(Snake.SnakeDirection.UP);
+                    break;
+                }
+                case KeyEvent.VK_DOWN: {
+                    snake.setDirection(Snake.SnakeDirection.DOWN);
+                    break;
+                }
+            }
+        }
     }
 }

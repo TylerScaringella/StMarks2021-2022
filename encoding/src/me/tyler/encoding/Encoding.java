@@ -1,24 +1,28 @@
 package me.tyler.encoding;
 
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
-
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Encoding {
 
-    private final Map<Character, Integer> freqMap;
     private final Map<Character, String> codeMap;
+    private final String codesPath = "C:\\Users\\tjsca\\Documents\\cs\\encoding\\codes.txt";
+    private final Map<String, Character> charMap;
+    private final Map<Character, Integer> freqMap;
 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws IOException {
         new Encoding();
     }
 
-    {
+    public Encoding() throws IOException {
+        // Initialize our maps
+        this.charMap = new HashMap<>();
         this.freqMap = new HashMap<>();
         this.codeMap = new HashMap<>();
+
+        // Read the file "read.txt" character by character
         try{
             FileReader reader = new FileReader("C:\\Users\\tjsca\\Documents\\cs\\encoding\\read.txt");
             int charNum = -1;
@@ -28,6 +32,7 @@ public class Encoding {
                 freq++;
                 this.freqMap.put(readChar, freq);
             }
+            reader.close();
         }catch(IOException ex) {
             ex.printStackTrace();
         }
@@ -57,9 +62,10 @@ public class Encoding {
         }
 
         this.buildCode("", queue.pop());
-        this.codeMap.forEach((key, value) -> {
-            System.out.println("Key: " + key + " | Value: " + value);
-        });
+
+        this.writeCodes();
+        handleWriting();
+        handleReading();
     }
 
     public void buildCode(String currentCode, Branch<Character> currentBranch) {
@@ -69,5 +75,77 @@ public class Encoding {
             this.buildCode(currentCode + "0", currentBranch.getLeft());
             this.buildCode(currentCode + "1", currentBranch.getRight());
         }
+    }
+
+    private void writeCodes() {
+        try {
+            FileWriter writer = new FileWriter(this.codesPath);
+            this.codeMap.forEach((character, code) -> {
+                try {
+                    writer.write(character + ":code:" + code + "\n");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            writer.close();
+        }catch(IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void handleWriting() throws IOException {
+        BufferedBitWriter writer = new BufferedBitWriter("C:\\Users\\tjsca\\Documents\\cs\\encoding\\compress.txt");
+        try{
+            FileReader reader = new FileReader("C:\\Users\\tjsca\\Documents\\cs\\encoding\\read.txt");
+            int charNum = -1;
+            while((charNum = reader.read()) != -1) {
+                // With a file reader, the method read returns an in
+                char readChar = (char) charNum;
+                String bits = this.codeMap.get(readChar);
+                String[] bitSplit = bits.split("");
+                for(String bit : bitSplit) {
+                    writer.writeBit(bit.equalsIgnoreCase("1"));
+                }
+            }
+        }catch(IOException ex) {
+            ex.printStackTrace();
+        }
+
+        writer.close();
+    }
+
+    private void handleReading() throws IOException {
+        FileWriter writer = new FileWriter("C:\\Users\\tjsca\\Documents\\cs\\encoding\\decompress.txt");
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(this.codesPath));
+
+            String line;
+
+            while((line = reader.readLine()) != null) {
+                String[] split = line.split(":code:");
+                char character = split[0].toCharArray()[0];
+                String code = split[1];
+                this.charMap.put(code, character);
+            }
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+
+        BufferedBitReader reader = new BufferedBitReader("C:\\Users\\tjsca\\Documents\\cs\\encoding\\compress.txt");
+
+        String cur = "";
+
+        while(reader.hasNext()) {
+            boolean bit = reader.readBit();
+            cur += (bit ? "1" : "0");
+
+            if(this.charMap.containsKey(cur)) {
+                writer.write(this.charMap.get(cur));
+                cur = "";
+            }
+        }
+
+        writer.close();
     }
 }

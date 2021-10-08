@@ -1,0 +1,7 @@
+ :code:111
+a:code:1100
+s:code:00
+t:code:01
+e:code:1101
+h:code:100
+i:code:101

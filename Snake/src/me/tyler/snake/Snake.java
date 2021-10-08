@@ -31,7 +31,6 @@ public class Snake {
     }
 
     public void moveSnake() {
-        System.out.println("moving snake");
         this.getComponents().forEach(component -> {
             switch(this.direction) {
                 case LEFT: {
