@@ -11,10 +11,14 @@ public class Snake {
     public Snake() {
         this.components = new ArrayList<>();
         // we need to create one component in the middle of the screen
-        this.components.add(new SnakeComponent(
+        SnakeComponent head = new SnakeComponent(
                 Constants.HEIGHT / 2,
                 Constants.WIDTH / 2
-        ));
+        );
+
+        head.setHead(true);
+        this.components.add(head);
+
         this.direction = SnakeDirection.UP;
     }
 
@@ -31,26 +35,33 @@ public class Snake {
     }
 
     public void moveSnake() {
-        this.getComponents().forEach(component -> {
-            switch(this.direction) {
-                case LEFT: {
-                    component.setX((component.getX() - (Constants.TILE_WIDTH / 4)));
-                    break;
-                }
-                case RIGHT: {
-                    component.setX((component.getX() + (Constants.TILE_WIDTH / 4)));
-                    break;
-                }
-                case UP: {
-                    component.setY((component.getY() - (Constants.TILE_WIDTH / 4)));
-                    break;
-                }
-                case DOWN: {
-                    component.setY((component.getY() + (Constants.TILE_WIDTH / 4)));
-                    break;
-                }
+        SnakeComponent component = this.components.get(0);
+        switch(this.direction) {
+            case LEFT: {
+                component.setX((component.getX() - (Constants.TILE_WIDTH / 4)));
+                break;
             }
-        });
+            case RIGHT: {
+                component.setX((component.getX() + (Constants.TILE_WIDTH / 4)));
+                break;
+            }
+            case UP: {
+                component.setY((component.getY() - (Constants.TILE_WIDTH / 4)));
+                break;
+            }
+            case DOWN: {
+                component.setY((component.getY() + (Constants.TILE_WIDTH / 4)));
+                break;
+            }
+        }
+
+        for(int i=this.components.size()-1; i>0; i--) {
+            SnakeComponent changing = this.components.get(i);
+            SnakeComponent previous = this.components.get(i-1);
+
+            changing.setX(previous.getX());
+            changing.setY(previous.getY());
+        }
     }
 
     public void addToSnake() {
@@ -104,6 +115,7 @@ public class Snake {
 
     public class SnakeComponent {
         private int x, y;
+        private boolean head;
 
         public SnakeComponent(int x, int y) {
             this.x = x;
@@ -124,6 +136,14 @@ public class Snake {
 
         public void setY(int y) {
             this.y = y;
+        }
+
+        public void setHead(boolean head) {
+            this.head = head;
+        }
+
+        public boolean isHead() {
+            return head;
         }
     }
 }
