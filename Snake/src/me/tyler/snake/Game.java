@@ -71,6 +71,9 @@ public class Game extends JFrame {
     private void drawBackground(Graphics g) {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, Constants.WIDTH, Constants.HEIGHT);
+
+        g.setColor(Color.WHITE);
+        g.drawString("jsdlfkjasdlkfjaslkdf", 10, 10);
     }
 
     private void drawSnake(Graphics g) {
@@ -109,10 +112,18 @@ public class Game extends JFrame {
                 }
             }
         }
+
+        Snake.SnakeComponent headComponent = this.snake.getComponents().get(0);
+
     }
 
     private void drawGameOver(Graphics g) {
         this.ticking = false;
+
+
+        g.setFont(new Font("TimesRoman", Font.PLAIN, 50));
+        g.drawString("Game Over", 150, Constants.HEIGHT / 2);
+        g.drawString("Score: " + this.score, 150, (Constants.HEIGHT / 2) + 50);
     }
 
     private void appleSpawn(Graphics g) {
@@ -128,8 +139,8 @@ public class Game extends JFrame {
         this.lastAppleSpawn = System.currentTimeMillis();
 
         ThreadLocalRandom random = ThreadLocalRandom.current();
-        int x = random.nextInt(0, Constants.WIDTH);
-        int y = random.nextInt(0, Constants.HEIGHT);
+        int x = random.nextInt(20, Constants.WIDTH-20);
+        int y = random.nextInt(20, Constants.HEIGHT-20);
 
         this.apples.add(new Apple(x, y));
     }
@@ -147,9 +158,6 @@ public class Game extends JFrame {
                 appleSpawn(g);
                 // detect collision
                 detectCollision();
-
-                g.setColor(Color.WHITE);
-                g.drawString("PUMPKIN", 10, 10);
                 break;
             }
             case STOPPED: {
