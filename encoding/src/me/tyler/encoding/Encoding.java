@@ -8,24 +8,33 @@ import java.util.Map;
 public class Encoding {
 
     private final Map<Character, String> codeMap;
-    private final String codesPath = "C:\\Users\\tjsca\\Documents\\cs\\encoding\\codes.txt";
     private final Map<String, Character> charMap;
     private final Map<Character, Integer> freqMap;
 
+    private final File codesPath, readPath, compressedPath, decompressedPath;
 
-    public static void main(String[] args) throws IOException {
-        new Encoding();
-    }
 
-    public Encoding() throws IOException {
+    public Encoding(String readPath) throws IOException {
         // Initialize our maps
         this.charMap = new HashMap<>();
         this.freqMap = new HashMap<>();
         this.codeMap = new HashMap<>();
 
+
+        this.readPath = new File(readPath);
+        readPath = readPath.replace(".txt", "");
+
+        this.codesPath = new File(readPath + "-codes.txt");
+        this.compressedPath = new File(readPath + "-compressed.txt");
+        this.decompressedPath = new File(readPath + "-decompressed.txt");
+
+        this.checkExisting(this.codesPath);
+        this.checkExisting(this.compressedPath);
+        this.checkExisting(this.decompressedPath);
+
         // Read the file "read.txt" character by character
         try{
-            FileReader reader = new FileReader("C:\\Users\\tjsca\\Documents\\cs\\encoding\\read.txt");
+            FileReader reader = new FileReader(this.readPath);
             int charNum = -1;
             while((charNum = reader.read()) != -1) {
                 char readChar = (char) charNum;
@@ -73,6 +82,11 @@ public class Encoding {
         handleReading();
     }
 
+    public void checkExisting(File file) throws IOException {
+        if(!file.exists())
+            file.createNewFile();
+    }
+
     public void buildCode(String currentCode, Branch<Character> currentBranch) {
         // If a branch is a leaf then we know that there are no more children
         if(currentBranch.isLeaf()) {
@@ -87,6 +101,7 @@ public class Encoding {
     private void writeCodes() {
         try {
             FileWriter writer = new FileWriter(this.codesPath);
+
             this.codeMap.forEach((character, code) -> {
                 try {
                     // This will write our codes into our codes.txt file in the format "(char):code:(code)"
@@ -107,9 +122,9 @@ public class Encoding {
     }
 
     private void handleWriting() throws IOException {
-        BufferedBitWriter writer = new BufferedBitWriter("C:\\Users\\tjsca\\Documents\\cs\\encoding\\compress.txt");
+        BufferedBitWriter writer = new BufferedBitWriter(this.compressedPath.getAbsolutePath());
         try{
-            FileReader reader = new FileReader("C:\\Users\\tjsca\\Documents\\cs\\encoding\\read.txt");
+            FileReader reader = new FileReader(this.readPath);
             int charNum = -1;
             while((charNum = reader.read()) != -1) {
                 char readChar = (char) charNum;
@@ -129,7 +144,7 @@ public class Encoding {
     }
 
     private void handleReading() throws IOException {
-        FileWriter writer = new FileWriter("C:\\Users\\tjsca\\Documents\\cs\\encoding\\decompress.txt");
+        FileWriter writer = new FileWriter(this.decompressedPath);
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(this.codesPath));
@@ -157,7 +172,7 @@ public class Encoding {
             ex.printStackTrace();
         }
 
-        BufferedBitReader reader = new BufferedBitReader("C:\\Users\\tjsca\\Documents\\cs\\encoding\\compress.txt");
+        BufferedBitReader reader = new BufferedBitReader(this.compressedPath.getAbsolutePath());
 
         String cur = "";
 

@@ -70,7 +70,7 @@ public class Game extends JFrame {
         g.fillRect(0, 0, Constants.WIDTH, Constants.HEIGHT);
 
         g.setColor(Color.WHITE);
-        g.drawString("jsdlfkjasdlkfjaslkdf", 10, 10);
+        g.drawString("Score: " + this.score, 10, 10);
     }
 
     private void drawSnake(Graphics g) {
@@ -92,7 +92,6 @@ public class Game extends JFrame {
     private void detectCollision() {
         Optional<Snake.SnakeComponent> colliding = this.snake.getComponents().stream().filter(component -> component.getX() <= 0 || component.getX() >= Constants.WIDTH || component.getY() <= 0 || component.getY() >= Constants.HEIGHT).findAny();
         if(colliding.isPresent()) {
-            System.out.println("Collision detected!");
             setGameState(GameState.STOPPED);
         }
 
@@ -111,7 +110,14 @@ public class Game extends JFrame {
         }
 
         Snake.SnakeComponent headComponent = this.snake.getComponents().get(0);
-
+        Snake.SnakeComponent second = this.snake.getComponents().get(1);
+        Optional<Snake.SnakeComponent> selfColliding = this.snake.getComponents().stream().filter(component -> {
+            if(second == component) return false;
+            return (headComponent.getX() == component.getX() && headComponent.getY() == component.getY());
+        }).findAny();
+        if(selfColliding.isPresent()) {
+            System.out.println("Self Colliding");
+        }
     }
 
     private void drawGameOver(Graphics g) {
