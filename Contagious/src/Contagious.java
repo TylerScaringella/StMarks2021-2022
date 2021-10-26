@@ -7,13 +7,14 @@ public class Contagious {
     }
 
     public Contagious() {
-        boolean[] arr = {true, true, true, false, true, true, true};
+        boolean[] arr = {true, true, true};
+//        boolean[] arr = {true, true, true, false, true, true, true};
 
         System.out.println(solve(arr));
     }
 
     public int solve(boolean[] arr) {
-        int steps = 0;
+        int steps = -1;
 
 
         // go through and find locations of true and falses
@@ -28,7 +29,7 @@ public class Contagious {
                     if(i > 0) {
                         int leftIndex = i-1;
                         if(arr[leftIndex]) {
-                            System.out.println("Setting index " + leftIndex + " to false");
+//                            System.out.println("Setting index " + leftIndex + " to false");
                             arr[leftIndex] = false;
                             didStep = true;
                             loop = 0;
@@ -39,7 +40,7 @@ public class Contagious {
                     if(i < (arr.length - 1)) {
                         int rightIndex = i+1;
                         if(arr[rightIndex]) {
-                            System.out.println("Setting index " + rightIndex + " to false");
+//                            System.out.println("Setting index " + rightIndex + " to false");
                             arr[rightIndex] = false;
                             didStep = true;
                             loop = 0;
@@ -51,8 +52,8 @@ public class Contagious {
             loop++;
         }
 
-        System.out.println(Arrays.toString(arr));
+//        System.out.println(Arrays.toString(arr));
 
-        return steps == 0 ? -1 : steps;
+        return steps == -1 ? -1 : steps + 1;
     }
 }
