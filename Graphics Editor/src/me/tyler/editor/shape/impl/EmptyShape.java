@@ -4,9 +4,8 @@ import me.tyler.editor.shape.Shape;
 
 import java.awt.*;
 
-public class Rectangle extends Shape {
-
-    public Rectangle(int x, int y, int w, int h, Color c) {
+public class EmptyShape extends Shape {
+    public EmptyShape(int x, int y, int w, int h, Color c) {
         super(x, y, w, h, c);
     }
 
@@ -17,13 +16,12 @@ public class Rectangle extends Shape {
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(this.c);
-        g.fillRect(this.x, this.y, this.width, this.height);
+
     }
 
     @Override
     public boolean isOn(int x, int y) {
-        return x >= this.x && x <= (this.x + this.width) && y >= this.y && y <= (this.y + this.height);
+        return false;
     }
 
     @Override

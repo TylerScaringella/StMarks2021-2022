@@ -6,8 +6,20 @@ import java.awt.*;
 
 public class Circle extends Shape {
 
-    public Circle(int x, int y, int w, int h, Color c) {
-        super(x, y, w, h, c);
+    protected int centerX, centerY, radius;
+
+    /**
+     *
+     * @param x - X of center
+     * @param y - Y of center
+     * @param r - Radius
+     * @param c - Color
+     */
+    public Circle(int x, int y, int r, Color c) {
+        super(x - r, y - r, r*2, r*2, c);
+        this.centerX = x;
+        this.centerY = y;
+        this.radius = r;
     }
 
     @Override
@@ -23,7 +35,9 @@ public class Circle extends Shape {
 
     @Override
     public boolean isOn(int x, int y) {
-        return false;
+        // distance from center | need to compare that to the radius
+        double distance = Math.sqrt(Math.pow((this.centerY - y), 2) + Math.pow((this.centerX - x), 2));
+        return distance <= this.radius;
     }
 
     @Override
