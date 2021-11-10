@@ -22,26 +22,33 @@ public class Circle extends Shape {
         this.radius = r;
     }
 
-    @Override
-    public Shape copy() {
-        return null;
+    public Circle(int x, int y, int r, Color c, boolean created) {
+        this(x, y, r, c);
+        this.created = created;
     }
 
     @Override
     public void draw(Graphics g) {
         g.setColor(this.c);
-        g.fillOval(this.x, this.y, this.width, this.height);
+        if(created) {
+            g.fillOval(this.x, this.y, this.width, this.height);
+        } else {
+            g.drawOval(this.x, this.y, this.width, this.height);
+        }
     }
 
     @Override
     public boolean isOn(int x, int y) {
         // distance from center | need to compare that to the radius
-        double distance = Math.sqrt(Math.pow((this.centerY - y), 2) + Math.pow((this.centerX - x), 2));
+        double distance = Math.sqrt(Math.pow((getCenterY() - y), 2) + Math.pow((getCenterX() - x), 2));
         return distance <= this.radius;
     }
 
-    @Override
-    public void resize(int x1, int y1, int x2, int y2) {
+    public int getCenterX() {
+        return this.x + this.radius;
+    }
 
+    public int getCenterY() {
+        return this.y + this.radius;
     }
 }

@@ -8,13 +8,11 @@ import java.util.function.BiConsumer;
 public class ButtonBuilder {
 
     private final JButton button;
-    private final String text;
     private final BiConsumer<ClickType, MouseEvent> event;
 
     public ButtonBuilder(String text, BiConsumer<ClickType, MouseEvent> event) {
         this.button = new JButton(text);
 
-        this.text = text;
         this.event = event;
 
         this.button.addMouseListener(new MouseListener() {
