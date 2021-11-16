@@ -3,6 +3,8 @@ package me.tyler.editor;
 import me.tyler.editor.shape.Shape;
 import me.tyler.editor.shape.impl.*;
 import me.tyler.editor.shape.impl.Rectangle;
+import me.tyler.editor.shape.impl.pen.PenLocation;
+import me.tyler.editor.shape.impl.pen.PenShape;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,6 +23,8 @@ public class GraphicsEditor {
     private Shape beingCreated, beingMoved;
     private Type selectedType;
     private Shape lastDeleted;
+    private PenShape currentPen;
+    private LineShape currentLine;
 
     private int startX, startY, endX, endY;
     private int moveStartX, moveStartY;
@@ -68,6 +72,18 @@ public class GraphicsEditor {
            }
        }).build());
 
+       topRow.add(new ButtonBuilder("Pen", (type, event) -> {
+           if(type == ClickType.CLICKED) {
+               this.selectedType = PenShape.class;
+           }
+       }).build());
+
+       topRow.add(new ButtonBuilder("Line", (type, event) -> {
+           if(type == ClickType.CLICKED) {
+               this.selectedType = LineShape.class;
+           }
+       }).build());
+
        // Second Row of buttons
         JPanel secondRow = new JPanel();
         secondRow.setLayout(new BoxLayout(secondRow, BoxLayout.X_AXIS));
@@ -78,13 +94,6 @@ public class GraphicsEditor {
 
         }).build());
 
-        secondRow.add(new ButtonBuilder("Undo", (type, event) -> {
-            if(type == ClickType.CLICKED) {
-                handleUndo();
-                frame.repaint();
-            }
-        }).build());
-
         secondRow.add(new ButtonBuilder("Color", (type, event) -> {
             if(type == ClickType.CLICKED) {
                 this.currentColor = JColorChooser.showDialog(null, "Choose a Color", this.currentColor);
@@ -92,12 +101,14 @@ public class GraphicsEditor {
         }).build());
 
         this.textField = new JTextField();
-        this.textField.setPreferredSize(new Dimension(20, 10));
+        this.textField.setPreferredSize(new Dimension(100, 25));
+        this.textField.setMaximumSize(this.textField.getPreferredSize());
         this.textField.setText("Text Content");
         secondRow.add(this.textField);
 
         this.sizeField = new JTextField();
-        this.sizeField.setPreferredSize(new Dimension(10, 10));
+        this.sizeField.setPreferredSize(new Dimension(50, 25));
+        this.sizeField.setMaximumSize(this.sizeField.getPreferredSize());
         this.sizeField.setText("15");
         secondRow.add(this.sizeField);
 
@@ -108,6 +119,13 @@ public class GraphicsEditor {
         thirdRow.add(new ButtonBuilder("Clear", (type, event) -> {
             if(type == ClickType.CLICKED) {
                 this.shapes.clear();
+                frame.repaint();
+            }
+        }).build());
+
+        thirdRow.add(new ButtonBuilder("Undo", (type, event) -> {
+            if(type == ClickType.CLICKED) {
+                handleUndo();
                 frame.repaint();
             }
         }).build());
@@ -125,6 +143,7 @@ public class GraphicsEditor {
                 super.paint(g);
                 shapes.forEach(shape -> shape.draw(g));
                 if(beingCreated != null) beingCreated.draw(g);
+                if(currentLine != null) currentLine.draw(g);
             }
         };
         canvas.setPreferredSize(new Dimension(1000, 500));
@@ -133,6 +152,8 @@ public class GraphicsEditor {
             @Override
             public void mouseDragged(MouseEvent e) {
                 handleShapeMove(e);
+                handlePenDrag(e);
+                handleLineDrag(e);
                 if(beingCreated != null)
                     handleShapeCreation(e);
                 frame.repaint();
@@ -155,6 +176,8 @@ public class GraphicsEditor {
                 startY = e.getY();
                 handleShapeCreation(e);
                 handleShapeMoveStart(e);
+                handlePenPress(e);
+                handleLinePress(e);
             }
 
             @Override
@@ -163,6 +186,8 @@ public class GraphicsEditor {
                 endY = e.getY();
                 handleRectangle(e);
                 handleCircle(e);
+                handlePenRelease(e);
+                handleLineRelease(e);
                 startX = 0;
                 startY = 0;
                 endX = 0;
@@ -195,6 +220,48 @@ public class GraphicsEditor {
         if(this.selectedType != Circle.class) return;
         int distance = (int) Math.sqrt(Math.pow((this.startY - endY), 2) + Math.pow((this.startX - endX), 2));
         this.shapes.add(new Circle(this.startX, this.startY, distance, this.currentColor));
+    }
+
+    private void handleLinePress(MouseEvent event) {
+        if(this.selectedType != LineShape.class) return;
+        this.currentLine = new LineShape(event.getX(), event.getY(), event.getX(), event.getY(), this.currentColor);
+    }
+
+    private void handleLineDrag(MouseEvent event) {
+        if(this.selectedType != LineShape.class) return;
+        if(this.currentLine == null) return;
+        this.currentLine.setEndX(event.getX());
+        this.currentLine.setEndY(event.getY());
+    }
+
+    private void handleLineRelease(MouseEvent event) {
+        if(this.selectedType != LineShape.class) return;
+        if(this.currentLine == null) return;
+        this.shapes.add(this.currentLine);
+        this.currentLine = null;
+    }
+
+    private void handlePenPress(MouseEvent event) {
+        if(this.selectedType != PenShape.class) return;
+
+        if(currentPen == null) {
+            PenShape pen = new PenShape(event.getPoint(), this.currentColor);
+            this.shapes.add(pen);
+            this.currentPen = pen;
+        }
+    }
+
+    private void handlePenDrag(MouseEvent event) {
+        if(this.selectedType != PenShape.class) return;
+        if(currentPen == null) return;
+        currentPen.getPixels().add(
+                new PenLocation(event.getX(), event.getY())
+        );
+    }
+
+    private void handlePenRelease(MouseEvent event) {
+        if(currentPen == null) return;
+        currentPen = null;
     }
 
     private void handleShapeCreation(MouseEvent event) {
