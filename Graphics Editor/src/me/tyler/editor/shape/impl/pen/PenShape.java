@@ -38,6 +38,7 @@ public class PenShape extends Shape {
             PenLocation curLocation = this.pixels.get(i);
             path.lineTo(curLocation.getX(), curLocation.getY());
         }
+
         path.closePath();
         g2d.draw(path);
     }

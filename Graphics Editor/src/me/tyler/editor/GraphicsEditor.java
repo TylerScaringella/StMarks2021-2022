@@ -6,11 +6,16 @@ import me.tyler.editor.shape.impl.Rectangle;
 import me.tyler.editor.shape.impl.pen.PenLocation;
 import me.tyler.editor.shape.impl.pen.PenShape;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +30,7 @@ public class GraphicsEditor {
     private Shape lastDeleted;
     private PenShape currentPen;
     private LineShape currentLine;
+    private BufferedImage selectedImage;
 
     private int startX, startY, endX, endY;
     private int moveStartX, moveStartY;
@@ -40,7 +46,7 @@ public class GraphicsEditor {
         JFrame frame = new JFrame();
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(1000, 600);
+        frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
 
         // Whole
         JPanel container = new JPanel();
@@ -49,7 +55,7 @@ public class GraphicsEditor {
         // Top Part of Entire thing
         JPanel holder = new JPanel();
         holder.setBackground(Color.GRAY);
-        holder.setPreferredSize(new Dimension(1000, 100));
+        holder.setPreferredSize(new Dimension((int)Toolkit.getDefaultToolkit().getScreenSize().getWidth(), 100));
         holder.setLayout(new BoxLayout(holder, BoxLayout.Y_AXIS));
 
         // First Row of buttons
@@ -112,6 +118,26 @@ public class GraphicsEditor {
         this.sizeField.setText("15");
         secondRow.add(this.sizeField);
 
+        secondRow.add(new ButtonBuilder("Image", (type, event) -> {
+            if(type == ClickType.CLICKED) {
+                this.selectedType = ImageShape.class;
+
+                JFileChooser chooser = new JFileChooser();
+                FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                        "Images",
+                        "jpg", "jpeg", "png");
+                chooser.setFileFilter(filter);
+                int r = chooser.showOpenDialog(null);
+                if(r == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        this.selectedImage = ImageIO.read(new File(chooser.getSelectedFile().getAbsolutePath()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).build());
+
         // Third Row of buttons
         JPanel thirdRow = new JPanel();
         thirdRow.setLayout(new BoxLayout(thirdRow, BoxLayout.X_AXIS));
@@ -146,7 +172,7 @@ public class GraphicsEditor {
                 if(currentLine != null) currentLine.draw(g);
             }
         };
-        canvas.setPreferredSize(new Dimension(1000, 500));
+        canvas.setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
 
         canvas.addMouseMotionListener(new MouseMotionListener() {
             @Override
@@ -187,6 +213,7 @@ public class GraphicsEditor {
                 handleRectangle(e);
                 handleCircle(e);
                 handlePenRelease(e);
+                handleImage(e);
                 handleLineRelease(e);
                 startX = 0;
                 startY = 0;
@@ -220,6 +247,26 @@ public class GraphicsEditor {
         if(this.selectedType != Circle.class) return;
         int distance = (int) Math.sqrt(Math.pow((this.startY - endY), 2) + Math.pow((this.startX - endX), 2));
         this.shapes.add(new Circle(this.startX, this.startY, distance, this.currentColor));
+    }
+
+    private void handleImage(MouseEvent event) {
+        if(this.selectedType != ImageShape.class) return;
+        if(this.selectedImage == null) return;
+        if(this.endX < this.startX) {
+            int tempStartX = this.startX;
+            this.startX = this.endX;
+            this.endX = tempStartX;
+        }
+
+        if(this.endY < this.startY) {
+            int tempStartY = this.startY;
+            this.startY = this.endY;
+            this.endY = tempStartY;
+        }
+
+        int width = endX - startX;
+        int height = endY - startY;
+        this.shapes.add(new ImageShape(startX, startY, width, height, this.selectedImage));
     }
 
     private void handleLinePress(MouseEvent event) {
@@ -290,6 +337,34 @@ public class GraphicsEditor {
             int width = ogX - startX;
             int height = ogY - startY;
             this.beingCreated = new Rectangle(this.startX, this.startY, width, height, this.currentColor, false);
+
+            if(flippedX)
+                this.startX = ogX;
+            if(flippedY)
+                this.startY = ogY;
+        } else if(this.selectedType == ImageShape.class) {
+            if(this.selectedImage == null) return;
+            boolean flippedX = false, flippedY = false;
+
+            int ogX = event.getX();
+            int ogY = event.getY();
+            if(ogX < this.startX) {
+                int tempStartX = this.startX;
+                this.startX = ogX;
+                ogX = tempStartX;
+                flippedX = true;
+            }
+
+            if(ogY < this.startY) {
+                int tempStartY = this.startY;
+                this.startY = ogY;
+                ogY = tempStartY;
+                flippedY = true;
+            }
+
+            int width = ogX - startX;
+            int height = ogY - startY;
+            this.beingCreated = new ImageShape(this.startX, this.startY, width, height, this.selectedImage);
 
             if(flippedX)
                 this.startX = ogX;
