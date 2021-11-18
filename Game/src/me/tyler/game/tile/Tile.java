@@ -1,28 +1,28 @@
 package me.tyler.game.tile;
 
-import me.tyler.game.GameConstants;
+import me.tyler.game.sprite.Sprite;
+
+import java.awt.image.BufferedImage;
 
 public class Tile {
-    private int x, y;
 
-    public Tile(int x, int y) {
-        this.x = x;
-        this.y = y;
+    private final TileType type;
+    private final Sprite sprite;
+
+    public Tile(TileType type, Sprite sprite) {
+        this.type = type;
+        this.sprite = sprite;
     }
 
-    public int getX() {
-        return x;
+    public TileType getType() {
+        return type;
     }
 
-    public int getY() {
-        return y;
+    public Sprite getSprite() {
+        return sprite;
     }
 
-    public int getEndX() {
-        return this.x + GameConstants.TILE_SIZE;
-    }
-
-    public int getEndY() {
-        return this.y + GameConstants.TILE_SIZE;
+    public BufferedImage getImage() {
+        return sprite.getImage();
     }
 }
