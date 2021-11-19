@@ -1,5 +1,6 @@
 package me.tyler.game;
 
+import me.tyler.game.map.MapHandler;
 import me.tyler.game.sprite.SpriteHandler;
 import me.tyler.game.state.GameState;
 import me.tyler.game.state.impl.PlayingState;
@@ -14,13 +15,14 @@ public class GamePanel extends JPanel {
 
     private final TileHandler tileHandler;
     private final SpriteHandler spriteHandler;
+    private final MapHandler mapHandler;
 
     private GameState gameState;
 
     public GamePanel() {
-
         this.spriteHandler = new SpriteHandler(this);
         this.tileHandler = new TileHandler(this.spriteHandler);
+        this.mapHandler = new MapHandler(this);
 
         this.gameState = new PlayingState(this);
 

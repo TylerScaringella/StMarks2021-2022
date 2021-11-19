@@ -101,10 +101,21 @@ public enum TileType {
     CARPET_4(7, 16);
 
     private int row, col;
+    private char id;
 
     TileType(int row, int col) {
         this.row = row;
         this.col = col;
+    }
+
+    TileType(char id, int row, int col) {
+        this.id = id;
+        this.row = row;
+        this.col = col;
+    }
+
+    public char getId() {
+        return id;
     }
 
     public int getRow() {

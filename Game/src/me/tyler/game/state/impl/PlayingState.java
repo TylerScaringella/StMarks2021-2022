@@ -15,8 +15,8 @@ public class PlayingState extends GameState {
 
     @Override
     public void render(Graphics g) {
-        int tpr = GameConstants.SCREEN_WIDTH / GameConstants.TILE_SIZE;
-        int tpc = GameConstants.SCREEN_HEIGHT / GameConstants.TILE_SIZE;
+        int tpr = GameConstants.SCREEN_COLS;
+        int tpc = GameConstants.SCREEN_ROWS;
 
         for(int col=0; col<tpr; col++) {
             for(int row=0; row<tpc; row++) {

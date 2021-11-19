@@ -13,7 +13,7 @@ public class Game {
     public Game() {
         this.gamePanel = new GamePanel();
         JFrame frame = new JFrame();
-        frame.setSize(GameConstants.SCREEN_WIDTH, GameConstants.SCREEN_HEIGHT);
+        frame.setSize(GameConstants.SCREEN_COLS * GameConstants.TILE_SIZE, GameConstants.SCREEN_ROWS * GameConstants.TILE_SIZE);
         frame.setTitle("Game");
         frame.setLocationRelativeTo(null);
         frame.add(this.gamePanel);
