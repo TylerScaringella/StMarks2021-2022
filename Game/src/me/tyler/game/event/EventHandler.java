@@ -38,8 +38,7 @@ public class EventHandler {
                 .forEach(method -> {
                     Class<? extends Event> eventTypeParameter = (Class<? extends Event>) method.getParameterTypes()[0];
                     Set<Method> activeListeners = this.listeners.getOrDefault(eventTypeParameter, new HashSet<>());
-                    activeListeners.addAll(methods);
-
+                    activeListeners.add(method);
                     this.listeners.put(eventTypeParameter, activeListeners);
                 });
 

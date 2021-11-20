@@ -1,6 +1,7 @@
 package me.tyler.game.entity;
 
 import me.tyler.game.GamePanel;
+import me.tyler.game.entity.impl.npc.maid.Maid;
 import me.tyler.game.entity.impl.player.Player;
 
 import java.util.HashSet;
@@ -19,6 +20,8 @@ public class EntityHandler {
         player.setRow(8);
         player.setCol(6);
         registerEntity(player);
+
+        registerEntity(new Maid());
     }
 
     public void registerEntity(Entity entity) {

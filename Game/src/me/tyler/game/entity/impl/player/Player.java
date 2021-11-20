@@ -4,6 +4,7 @@ import me.tyler.game.GameConstants;
 import me.tyler.game.GamePanel;
 import me.tyler.game.entity.Entity;
 import me.tyler.game.entity.EntityDirection;
+import me.tyler.game.event.impl.PlayerMoveEvent;
 import me.tyler.game.sprite.Sprite;
 
 import java.util.HashMap;
@@ -52,21 +53,49 @@ public class Player extends Entity {
         switch(getDirection()) {
             case LEFT: {
                 setSprite(this.sprites.get(EntityDirection.LEFT));
+                GamePanel.get().getEventHandler().handleEvent(new PlayerMoveEvent(
+                        this,
+                            getRow(),
+                            getCol(),
+                            getRow(),
+                            getCol()-1
+                        ));
                 setCol(getCol()-1);
                 break;
             }
             case RIGHT: {
                 setSprite(this.sprites.get(EntityDirection.RIGHT));
+                GamePanel.get().getEventHandler().handleEvent(new PlayerMoveEvent(
+                        this,
+                        getRow(),
+                        getCol(),
+                        getRow(),
+                        getCol()+1
+                ));
                 setCol(getCol()+1);
                 break;
             }
             case UP: {
                 setSprite(this.sprites.get(EntityDirection.UP));
+                GamePanel.get().getEventHandler().handleEvent(new PlayerMoveEvent(
+                        this,
+                        getRow(),
+                        getCol(),
+                        getRow()-1,
+                        getCol()
+                ));
                 setRow(getRow()-1);
                 break;
             }
             case DOWN: {
                 setSprite(this.sprites.get(EntityDirection.DOWN));
+                GamePanel.get().getEventHandler().handleEvent(new PlayerMoveEvent(
+                        this,
+                        getRow(),
+                        getCol(),
+                        getRow()+1,
+                        getCol()
+                ));
                 setRow(getRow()+1);
                 break;
             }
