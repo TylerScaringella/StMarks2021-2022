@@ -4,11 +4,8 @@ import me.tyler.game.GameConstants;
 import me.tyler.game.GamePanel;
 import me.tyler.game.entity.Entity;
 import me.tyler.game.entity.impl.npc.NPC;
-import me.tyler.game.event.GameEvent;
 import me.tyler.game.map.Map;
-import me.tyler.game.map.MapTile;
 import me.tyler.game.state.GameState;
-import me.tyler.game.tile.TileType;
 
 import java.awt.*;
 

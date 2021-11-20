@@ -1,7 +1,7 @@
 package me.tyler.game.entity;
 
 import me.tyler.game.GamePanel;
-import me.tyler.game.entity.impl.npc.maid.Maid;
+import me.tyler.game.entity.impl.npc.impl.maid.Maid;
 import me.tyler.game.entity.impl.player.Player;
 
 import java.util.HashSet;

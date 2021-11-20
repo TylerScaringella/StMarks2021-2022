@@ -1,4 +1,4 @@
-package me.tyler.game.entity.impl.npc.maid;
+package me.tyler.game.entity.impl.npc.impl.maid;
 
 import me.tyler.game.GamePanel;
 import me.tyler.game.entity.impl.npc.NPC;
