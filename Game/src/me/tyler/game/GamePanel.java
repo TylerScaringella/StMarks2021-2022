@@ -2,7 +2,10 @@ package me.tyler.game;
 
 import me.tyler.game.entity.Entity;
 import me.tyler.game.entity.EntityHandler;
-import me.tyler.game.listener.PlayerController;
+import me.tyler.game.event.EventHandler;
+import me.tyler.game.listener.game.RowClickListener;
+import me.tyler.game.listener.system.MouseController;
+import me.tyler.game.listener.system.PlayerController;
 import me.tyler.game.map.MapHandler;
 import me.tyler.game.sprite.SpriteHandler;
 import me.tyler.game.state.GameState;
@@ -11,6 +14,7 @@ import me.tyler.game.tile.TileHandler;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class GamePanel extends JPanel {
 
@@ -21,6 +25,7 @@ public class GamePanel extends JPanel {
     private final SpriteHandler spriteHandler;
     private final MapHandler mapHandler;
     private final EntityHandler entityHandler;
+    private final EventHandler eventHandler;
 
     private GameState gameState;
 
@@ -31,11 +36,17 @@ public class GamePanel extends JPanel {
         this.tileHandler = new TileHandler(this.spriteHandler);
         this.mapHandler = new MapHandler(this);
         this.entityHandler = new EntityHandler(this);
+        this.eventHandler = new EventHandler(this);
 
         this.gameState = new PlayingState(this);
 
         this.setFocusable(true);
         addKeyListener(new PlayerController(this));
+        addMouseListener(new MouseController(this));
+
+        Arrays.asList(
+                new RowClickListener()
+        ).forEach(this.eventHandler::registerListener);
 
         this.gameLoop = new GameLoop();
         this.gameLoop.start();
@@ -69,6 +80,10 @@ public class GamePanel extends JPanel {
 
     public EntityHandler getEntityHandler() {
         return entityHandler;
+    }
+
+    public EventHandler getEventHandler() {
+        return eventHandler;
     }
 
     public GameState getGameState() {

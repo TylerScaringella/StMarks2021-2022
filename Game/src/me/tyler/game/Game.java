@@ -1,7 +1,5 @@
 package me.tyler.game;
 
-import me.tyler.game.listener.PlayerController;
-
 import javax.swing.*;
 
 public class Game {

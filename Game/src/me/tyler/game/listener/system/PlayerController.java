@@ -1,4 +1,4 @@
-package me.tyler.game.listener;
+package me.tyler.game.listener.system;
 
 import me.tyler.game.GamePanel;
 import me.tyler.game.entity.EntityDirection;
@@ -18,22 +18,25 @@ public class PlayerController implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        this.gamePanel.getEntityHandler().getPlayer().setMoving(true);
         switch(e.getKeyChar()) {
             case 'w': {
                 this.gamePanel.getEntityHandler().getPlayer().setDirection(EntityDirection.UP);
+                this.gamePanel.getEntityHandler().getPlayer().setMoving(true);
                 break;
             }
             case 'a': {
                 this.gamePanel.getEntityHandler().getPlayer().setDirection(EntityDirection.LEFT);
+                this.gamePanel.getEntityHandler().getPlayer().setMoving(true);
                 break;
             }
             case 's': {
                 this.gamePanel.getEntityHandler().getPlayer().setDirection(EntityDirection.DOWN);
+                this.gamePanel.getEntityHandler().getPlayer().setMoving(true);
                 break;
             }
             case 'd': {
                 this.gamePanel.getEntityHandler().getPlayer().setDirection(EntityDirection.RIGHT);
+                this.gamePanel.getEntityHandler().getPlayer().setMoving(true);
                 break;
             }
         }

@@ -7,7 +7,7 @@ import java.util.UUID;
 public abstract class Entity {
 
     private final UUID id;
-    private final Sprite sprite;
+    private Sprite sprite;
     private int row, col;
     private boolean visible;
     private boolean moving;
@@ -31,6 +31,10 @@ public abstract class Entity {
 
     public Sprite getSprite() {
         return sprite;
+    }
+
+    public void setSprite(Sprite sprite) {
+        this.sprite = sprite;
     }
 
     public int getRow() {
