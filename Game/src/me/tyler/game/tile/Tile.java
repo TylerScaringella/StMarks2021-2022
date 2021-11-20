@@ -2,8 +2,6 @@ package me.tyler.game.tile;
 
 import me.tyler.game.sprite.Sprite;
 
-import java.awt.image.BufferedImage;
-
 public class Tile {
 
     private final TileType type;
@@ -20,9 +18,5 @@ public class Tile {
 
     public Sprite getSprite() {
         return sprite;
-    }
-
-    public BufferedImage getImage() {
-        return sprite.getImage();
     }
 }

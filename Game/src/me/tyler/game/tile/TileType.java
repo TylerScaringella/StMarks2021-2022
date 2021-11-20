@@ -31,7 +31,7 @@ public enum TileType {
     STONE_3(0, 10),
     STONE_4(0, 11),
 
-    BRICK_1(0, 12),
+    BRICK_1('b', 0, 12),
     BRICK_2(0, 13),
     BRICK_3(0, 14),
     BRICK_4(0, 15),
@@ -64,7 +64,7 @@ public enum TileType {
     MOUNTAIN_1(4, 6),
     MOUNTAIN_2(4, 7),
 
-    GRASS_1(1, 14),
+    GRASS_1('g', 1, 14),
     GRASS_2(1, 15),
     GRASS_3(2, 14),
     GRASS_4(2, 15),
@@ -79,7 +79,7 @@ public enum TileType {
     BRUSH_LARGE_3(2, 12),
     BRUSH_LARGE_4(2, 13),
 
-    PATH(4, 11),
+    PATH('p', 4, 11),
 
     FURNACE_1(7, 2),
     FURNACE_2(7, 1),

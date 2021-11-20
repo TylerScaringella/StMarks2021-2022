@@ -26,4 +26,16 @@ public class TileHandler {
     public Tile getTile(TileType type) {
         return tiles.getOrDefault(type, null);
     }
+
+    public Tile getTile(char id) {
+        TileType type = null;
+
+        for(TileType tileType : TileType.values()) {
+            if(tileType.getId() == id) {
+                type = tileType;
+                break;
+            }
+        }
+        return tiles.getOrDefault(type, null);
+    }
 }

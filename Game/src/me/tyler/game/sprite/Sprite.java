@@ -24,9 +24,4 @@ public class Sprite {
     public int getCol() {
         return col;
     }
-
-    @Override
-    public String toString() {
-        return "Sprite{" + "row=" + row + ", col=" + col + ", image=" + image + '}';
-    }
 }
