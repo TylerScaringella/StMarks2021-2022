@@ -94,6 +94,12 @@ public class Board {
                 direction = MoveDirection.LEFT;
                 break;
             }
+            case 10: {
+                if(won || lost) {
+                    this.gamePanel.setBoard(new Board(this.gamePanel));
+                }
+                break;
+            }
         }
 
         if(direction == null) return;
@@ -117,22 +123,23 @@ public class Board {
 
         tiles.forEach((location, tile) -> {
             // above
-            if(location.getRow() != 1) {
+            if(canMove.get()) return;
+            if(location.getRow() != 1 && !canMove.get()) {
                 canMove.set(getTile(location.getRow() - 1, location.getCol()).getValue() == tile.getValue());
             }
 
             // below
-            if(location.getRow() != 4) {
+            if(location.getRow() != 4 && !canMove.get()) {
                 canMove.set(getTile(location.getRow() + 1, location.getCol()).getValue() == tile.getValue());
             }
 
             // left
-            if(location.getCol() != 1) {
+            if(location.getCol() != 1 && !canMove.get()) {
                 canMove.set(getTile(location.getRow(), location.getCol() - 1).getValue() == tile.getValue());
             }
 
             // right
-            if(location.getCol() != 4) {
+            if(location.getCol() != 4 && !canMove.get()) {
                 canMove.set(getTile(location.getRow(), location.getCol() + 1).getValue() == tile.getValue());
             }
         });
