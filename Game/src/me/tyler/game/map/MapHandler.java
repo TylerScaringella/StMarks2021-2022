@@ -16,10 +16,7 @@ public class MapHandler {
         this.mapGenerator = new MapGenerator(gamePanel);
         this.maps = new ArrayList<>();
 
-        Map generatedMap = this.mapGenerator.generateMap(3);
-        generatedMap.setActive(true);
-        this.maps.add(generatedMap);
-//        loadMap();
+        loadMap();
     }
 
     public void loadMap() {

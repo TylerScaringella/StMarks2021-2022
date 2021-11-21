@@ -3,7 +3,9 @@ package me.tyler.game;
 import me.tyler.game.entity.Entity;
 import me.tyler.game.entity.EntityHandler;
 import me.tyler.game.event.EventHandler;
+import me.tyler.game.event.impl.PlayerMoveEvent;
 import me.tyler.game.listener.game.PlayerInputListener;
+import me.tyler.game.listener.game.PlayerListener;
 import me.tyler.game.listener.system.MouseController;
 import me.tyler.game.listener.system.PlayerController;
 import me.tyler.game.map.MapHandler;
@@ -45,7 +47,8 @@ public class GamePanel extends JPanel {
         addMouseListener(new MouseController(this));
 
         Arrays.asList(
-                new PlayerInputListener()
+                new PlayerInputListener(),
+                new PlayerListener()
         ).forEach(this.eventHandler::registerListener);
 
         this.gameLoop = new GameLoop();
