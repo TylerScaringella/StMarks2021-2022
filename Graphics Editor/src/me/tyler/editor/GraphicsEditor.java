@@ -122,6 +122,7 @@ public class GraphicsEditor {
             if(type == ClickType.CLICKED) {
                 this.selectedType = ImageShape.class;
 
+                // Create a file chooser, and limit the file types that can be loaded
                 JFileChooser chooser = new JFileChooser();
                 FileNameExtensionFilter filter = new FileNameExtensionFilter(
                         "Images",
@@ -252,6 +253,7 @@ public class GraphicsEditor {
     private void handleImage(MouseEvent event) {
         if(this.selectedType != ImageShape.class) return;
         if(this.selectedImage == null) return;
+        // We need to have a check to see if the current location of the mouse is to the left of the start location, and if it is, we create temporary variables that allow us to switch the location because in the draw method it takes in the x and the y of the top left
         if(this.endX < this.startX) {
             int tempStartX = this.startX;
             this.startX = this.endX;
@@ -394,6 +396,7 @@ public class GraphicsEditor {
 
     private void handleDelete(MouseEvent event) {
         if(this.selectedType != EmptyShape.class) return;
+        // Filter through all of the shapes and find any shape that contains the current mouse location
         Optional<Shape> shapeOptional = this.shapes.stream().filter(shape -> shape.isOn(event.getX(), event.getY())).findFirst();
         if(shapeOptional.isPresent()) {
             Shape clickedShape = shapeOptional.get();
