@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Maze extends JPanel{
 
-    private final boolean[][] board;
+    private boolean[][] board;
 
     private final int BOARD_ROWS = 20,
                       BOARD_COLS = 20;
@@ -56,20 +56,27 @@ public class Maze extends JPanel{
 
         int startRow = ThreadLocalRandom.current().nextInt(0, board.length);
 
-        System.out.println("Start | Row: " + startRow + ", Col: " + startCol);
+//        System.out.println("Start | Row: " + startRow + ", Col: " + startCol);
 
         board[startRow][startCol] = true;
 
-        boolean value = false;
+        boolean built = false;
+        int times = 0;
 
-        for(int i=0; i<100; i++) {
-            value = generatePath(startRow, startCol, true);
-            System.out.println(value);
-            if(value)
-                break;
+        while(!built) {
+            times++;
+            boolean path = generatePath(startRow, startCol, true);
+            if(path) {
+//                printBoard();
+                built = true;
+            } else {
+                this.board = new boolean[BOARD_ROWS][BOARD_COLS];
+                board[startRow][startCol] = true;
+            }
         }
 
-        if(!value) System.out.println("maze wasnt generated");
+        this.repaint();
+        System.out.println(String.format("Generated a working maze in %s attempts", times));
 
         // need to check if theres a solution, if not keep generating until there is
 
@@ -91,7 +98,12 @@ public class Maze extends JPanel{
 
         int timesRan = 0;
 
-        System.out.println(String.format("%s, %s", nextRow, nextCol));
+//        System.out.println(String.format("%s, %s", nextRow, nextCol));
+//        System.out.println(nextCol < board[0].length);
+//        System.out.println(nextCol >= 0);
+//        System.out.println(nextRow < board.length);
+//        System.out.println(nextRow >= 0);
+//        System.out.println(!board[nextRow][nextCol]);
         while(nextCol < board[0].length && nextCol >= 0 && nextRow < board.length && nextRow >= 0 && (!board[nextRow][nextCol])) {
             timesRan++;
             board[nextRow][nextCol] = true;
@@ -115,7 +127,7 @@ public class Maze extends JPanel{
                 System.out.println("something went wrong, " + direction);
             }
 
-            System.out.println(String.format("Time: %s | loop: %s, %s", timesRan, nextRow, nextCol));
+//            System.out.println(String.format("Time: %s | loop: %s, %s", timesRan, nextRow, nextCol));
         }
         return nextCol == board[0].length;
     }
@@ -136,7 +148,7 @@ public class Maze extends JPanel{
     private void printBoard() {
         for(int row = 0; row<board.length; row++) {
             for(int col = 0; col<board[0].length; col++) {
-                System.out.print(board[row][col] + " ");
+                System.out.print((board[row][col] ? "x" : "o") + " ");
             }
             System.out.println();
         }
