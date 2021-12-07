@@ -98,12 +98,6 @@ public class Maze extends JPanel{
 
         int timesRan = 0;
 
-//        System.out.println(String.format("%s, %s", nextRow, nextCol));
-//        System.out.println(nextCol < board[0].length);
-//        System.out.println(nextCol >= 0);
-//        System.out.println(nextRow < board.length);
-//        System.out.println(nextRow >= 0);
-//        System.out.println(!board[nextRow][nextCol]);
         while(nextCol < board[0].length && nextCol >= 0 && nextRow < board.length && nextRow >= 0 && (!board[nextRow][nextCol])) {
             timesRan++;
             board[nextRow][nextCol] = true;
