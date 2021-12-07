@@ -31,7 +31,7 @@ public class Maze extends JPanel{
 
         frame.setVisible(true);
         generateMaze();
-//        fillMaze();
+        fillMaze();
         this.repaint();
     }
 
@@ -124,13 +124,15 @@ public class Maze extends JPanel{
     }
 
     private void fillMaze() {
-        for(int i=0; i<100; i++) {
+        for(int i=0; i<15; i++) {
             int row = ThreadLocalRandom.current().nextInt(2, board.length-1);
             int col = ThreadLocalRandom.current().nextInt(2, board[0].length-1);
-            if(board[row][col]) {
-                generatePath(row, col);
-                return;
+
+            while(!board[row][col]) {
+                col = ThreadLocalRandom.current().nextInt(2, board[0].length-1);
             }
+
+            generatePath(row, col);
         }
     }
 
