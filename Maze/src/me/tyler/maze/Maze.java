@@ -1,5 +1,7 @@
 package me.tyler.maze;
 
+import sun.invoke.util.VerifyType;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -29,6 +31,8 @@ public class Maze extends JPanel{
 
         frame.setVisible(true);
         generateMaze();
+//        fillMaze();
+        this.repaint();
     }
 
     @Override
@@ -75,13 +79,7 @@ public class Maze extends JPanel{
             }
         }
 
-        this.repaint();
         System.out.println(String.format("Generated a working maze in %s attempts", times));
-
-        // need to check if theres a solution, if not keep generating until there is
-
-        // go in and fill extra paths
-//        fillMaze();
     }
 
     private boolean generatePath(int row, int col, boolean right) {
@@ -120,23 +118,44 @@ public class Maze extends JPanel{
             } else {
                 System.out.println("something went wrong, " + direction);
             }
-
-//            System.out.println(String.format("Time: %s | loop: %s, %s", timesRan, nextRow, nextCol));
         }
+
         return nextCol == board[0].length;
     }
 
     private void fillMaze() {
-        for(int i=0; i<25; i++) {
-            // generate different random paths
+        for(int i=0; i<100; i++) {
             int row = ThreadLocalRandom.current().nextInt(2, board.length-1);
             int col = ThreadLocalRandom.current().nextInt(2, board[0].length-1);
-
-            if(i > 3)
-                generatePath(row, col, false);
-            else
-                generatePath(row, col, true);
+            if(board[row][col]) {
+                generatePath(row, col);
+                return;
+            }
         }
+    }
+
+    private void generatePath(int row, int col) {
+        if(row < 1 || col < 1 || row > board.length-2 || col > board[0].length-2) return;
+
+        final int HORIZONTAL = 40;
+        final int VERTICAL = 100;
+
+        int direction = ThreadLocalRandom.current().nextInt(0, 100);
+        if(direction <= HORIZONTAL) {
+            if(direction <= (HORIZONTAL / 2))
+                col--;
+            else
+                col++;
+        } else if(direction <= VERTICAL) {
+            if((row > (board.length / 2)))
+                row--;
+            else
+                row++;
+        }
+
+        board[row][col] = true;
+        System.out.println(String.format("%s, %s", row, col));
+        generatePath(row, col);
     }
 
     private void printBoard() {
