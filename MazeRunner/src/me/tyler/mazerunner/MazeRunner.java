@@ -3,6 +3,7 @@ package me.tyler.mazerunner;
 // class that generates a maze, then uses student-built bots
 // to solve the maze blindly
 
+import me.tyler.mazerunner.impl.LoserBot;
 import me.tyler.mazerunner.impl.TylerBot;
 
 import java.awt.Color;
@@ -22,11 +23,14 @@ import javax.swing.KeyStroke;
 
 public class MazeRunner {
 
-    private int speed = 2000000; // default is 100- smaller = slower
+    private int speed = 100; // default is 100- smaller = slower
 
     // constructs and adds the bots competing into the maze
     private void addBots() {
-        Bot[] bots = {new TylerBot(this)};
+        Bot[] bots = {
+//                new TylerBot(this),
+                new LoserBot(this)
+        };
         for (Bot b : bots)
             robots.put(b, new RobotInfo());
     }
