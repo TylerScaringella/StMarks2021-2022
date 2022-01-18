@@ -4,8 +4,13 @@ import me.tyler.mazerunner.Bot;
 import me.tyler.mazerunner.MazeRunner;
 
 import java.awt.*;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoserBot extends Bot {
+
+    private final MazeRunner mr;
 
 //    private MovingState state;
 //    private boolean lastMove;
@@ -14,6 +19,7 @@ public class LoserBot extends Bot {
 
     public LoserBot(MazeRunner mr) {
         super(mr, Color.GREEN);
+        this.mr = mr;
 //        this.state = MovingState.IDLE;
         this.state = State.FORWARD;
     }
