@@ -15,13 +15,6 @@ public class LabeledGraph<E, T> {
         return this.vertices.size();
     }
 
-    public void remove(E info) {
-        final Vertex vertex = getVertex(info);
-        this.vertices.remove(info);
-
-        this.vertices.values().forEach(curVertex -> curVertex.getNeighbors().remove(vertex));
-    }
-
     public E add(E info) {
         Vertex vertex = new Vertex(info);
         this.vertices.put(info, vertex);
@@ -32,12 +25,18 @@ public class LabeledGraph<E, T> {
         return this.vertices.containsKey(info);
     }
 
-    public void connect(E one, E two) {
+    public void connect(E one, E two, T label) {
         final Vertex first = getVertex(one);
         final Vertex second = getVertex(two);
 
-        first.addNeighbor(second);
-        second.addNeighbor(first);
+        final Edge edge = new Edge(
+                first,
+                second,
+                label
+        );
+
+        first.addEdge(edge);
+        second.addEdge(edge);
     }
 
     public List<E> path(E start, E end) {
@@ -56,12 +55,12 @@ public class LabeledGraph<E, T> {
         while(!toVisit.isEmpty()) {
             curr = toVisit.remove(0);
 
-            for(Vertex neighbor : curr.getNeighbors()) {
-                if(!leadsTo.containsKey(neighbor)) {
-                    toVisit.add(neighbor);
-                    leadsTo.put(neighbor, curr);
+            for(Edge edge : curr.getEdges()) {
+                if(!leadsTo.containsKey(edge.getV1())) {
+                    toVisit.add(edge.getV1());
+                    leadsTo.put(edge.getV1(), curr);
                 }
-                if(neighbor.equals(end)) {
+                if(edge.getV1().equals(end)) {
                     return backtrace(leadsTo, end);
                 }
             }
@@ -88,50 +87,60 @@ public class LabeledGraph<E, T> {
         return this.vertices.get(info);
     }
 
-    public void debug() {
-        this.vertices.values().forEach(value -> {
-            System.out.println("--------------------------------");
-            System.out.println(
-                    "Info: " + value.getInfo() + "\n" +
-                            "Neighbors: " + value.getNeighbors().stream().map(Vertex::getInfo).map(E::toString).collect(Collectors.joining(","))
-            );
-        });
-        System.out.println("--------------------------------");
-    }
+//    public void debug() {
+//        this.vertices.values().forEach(value -> {
+//            System.out.println("--------------------------------");
+//            System.out.println(
+//                    "Info: " + value.getInfo() + "\n" +
+//                            "Neighbors: " + value.getNeighbors().stream().map(Vertex::getInfo).map(E::toString).collect(Collectors.joining(","))
+//            );
+//        });
+//        System.out.println("--------------------------------");
+//    }
 
     private class Vertex {
         private E info;
-        private Set<Vertex> neighbors;
+        private Set<Edge> edges;
 
         public Vertex(E info) {
             this.info = info;
-            this.neighbors = new HashSet<>();
+            this.edges = new HashSet<>();
         }
 
-        public Vertex(E info, Set<Vertex> neighbors) {
-            this.info = info;
-            this.neighbors = neighbors;
-        }
-
-        public boolean isNeighbor(Vertex vertex) {
-            return this.neighbors.contains(vertex);
-        }
-
-        public Vertex addNeighbor(Vertex vertex) {
-            this.neighbors.add(vertex);
-            return vertex;
+        public Edge addEdge(Edge edge) {
+            this.edges.add(edge);
+            return edge;
         }
 
         public E getInfo() {
             return info;
         }
 
-        public Set<Vertex> getNeighbors() {
-            return neighbors;
+        public Set<Edge> getEdges() {
+            return edges;
+        }
+    }
+
+    private class Edge {
+        private Vertex v1, v2;
+        private T info;
+
+        public Edge(Vertex v1, Vertex v2, T info) {
+            this.v1 = v1;
+            this.v2 = v2;
+            this.info = info;
         }
 
-        public void setNeighbors(Set<Vertex> neighbors) {
-            this.neighbors = neighbors;
+        public Vertex getV1() {
+            return v1;
+        }
+
+        public Vertex getV2() {
+            return v2;
+        }
+
+        public T getInfo() {
+            return info;
         }
     }
 }
