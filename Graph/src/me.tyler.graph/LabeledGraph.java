@@ -1,14 +1,13 @@
 package me.tyler.graph;
 
-import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Graph<E> {
+public class LabeledGraph<E, T> {
 
     private final Map<E, Vertex> vertices;
 
-    public Graph() {
+    public LabeledGraph() {
         this.vertices = new HashMap<>();
     }
 
@@ -94,7 +93,7 @@ public class Graph<E> {
             System.out.println("--------------------------------");
             System.out.println(
                     "Info: " + value.getInfo() + "\n" +
-                    "Neighbors: " + value.getNeighbors().stream().map(Vertex::getInfo).map(E::toString).collect(Collectors.joining(","))
+                            "Neighbors: " + value.getNeighbors().stream().map(Vertex::getInfo).map(E::toString).collect(Collectors.joining(","))
             );
         });
         System.out.println("--------------------------------");
@@ -133,70 +132,6 @@ public class Graph<E> {
 
         public void setNeighbors(Set<Vertex> neighbors) {
             this.neighbors = neighbors;
-        }
-    }
-
-    public void save() {
-        try {
-            final FileWriter fileWriter = new FileWriter("C:\\users\\tjsca\\graph.txt");
-            final BufferedWriter writer = new BufferedWriter(fileWriter);
-
-            final List<Vertex> vertices = new ArrayList<>(this.vertices.values());
-
-            this.vertices.values().forEach(vertex -> {
-                final StringBuilder sb = new StringBuilder();
-
-                sb.append(vertex.getInfo() + (vertex.getNeighbors().size() > 0 ? "/split/" : ""));
-                if(vertex.neighbors.size() > 0)
-                    sb.append(vertex.getNeighbors().stream().map(vertices::indexOf).map(Objects::toString).collect(Collectors.joining(",")));
-                sb.append("//split//");
-                try {
-                    writer.write(sb.toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            writer.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public void fromFile(String fileName) {
-        try {
-            final FileReader fileReader = new FileReader("C:\\users\\tjsca\\graph.txt");
-            final BufferedReader reader = new BufferedReader(fileReader);
-
-            final String unparsedData = reader.readLine();
-            if(unparsedData == null) throw new RuntimeException("lol stupid idiot there's no data");
-
-            final String[] dataSplit = unparsedData.split("//split//");
-
-            final List<E> info = new ArrayList<>();
-            final Map<E, List<Integer>> neighbors = new HashMap<>();
-
-            for(String dataInput : dataSplit) {
-                String[] inputSplit = dataInput.split("/split/");
-                final E data = (E) inputSplit[0];
-                info.add(data);
-                String[] unparsedNeighbors = inputSplit[1].split(",");
-                neighbors.put(data, new ArrayList<>());
-                for(String neighbor : unparsedNeighbors) {
-                    int neighborId = Integer.parseInt(neighbor);
-                    final List<Integer> curNeighbors = neighbors.get(data);
-                    curNeighbors.add(neighborId);
-                    neighbors.put(data, curNeighbors);
-                }
-            }
-
-            info.forEach(data -> vertices.put(data, new Vertex(data)));
-            neighbors.forEach((key, value) -> {
-                final Vertex vertex = vertices.get(key);
-                vertex.setNeighbors(value.stream().map(info::get).map(vertices::get).collect(Collectors.toSet()));
-            });
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 }

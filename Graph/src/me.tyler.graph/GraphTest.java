@@ -21,9 +21,14 @@ public class GraphTest {
         testing.connect(friedman, testingStr);
         testing.connect(testingStr, abc);
 
-//        testing.debug();
+        testing.debug();
 
         System.out.println(testing.path(tyler, abc).toString());
         testing.save();
+
+
+        final Graph<String> fromFile = new Graph<>();
+        fromFile.fromFile("C:\\users\\tjsca\\graph.txt");
+        fromFile.debug();
     }
 }
