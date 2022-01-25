@@ -1,5 +1,6 @@
 package me.tyler.kbg;
 
+import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class KBG {
+public class KBG extends JPanel {
 
     private final LabeledGraph<String, String> graph;
 
@@ -19,6 +20,9 @@ public class KBG {
     private final AtomicInteger connections;
 
     public KBG() {
+        final JFrame frame = new JFrame();
+        frame.add(this);
+
         this.graph = new LabeledGraph<>();
 
         this.actors = new HashMap<>();
@@ -35,7 +39,7 @@ public class KBG {
 
         System.out.println(String.format("There are %s connections", connections.get()));
 
-        System.out.println(this.graph.path("Will Smith", "Ken Stott"));
+        frame.setVisible(true);
     }
 
     private void loadActors() {

@@ -98,7 +98,8 @@ public class LabeledGraph<E, T> {
 
         while(curr != null) {
             Edge edge = leadsTo.get(curr);
-            path.add(curr.getInfo() + " is connected to " + edge.getNeighbor(curr) + " by " + edge.label);
+            if(edge == null) break;
+            path.add(curr.getInfo() + " is connected to " + edge.getNeighbor(curr).getInfo() + " thru " + edge.label);
             curr = edge.getNeighbor(curr);
         }
 
