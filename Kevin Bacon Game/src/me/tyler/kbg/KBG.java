@@ -1,13 +1,16 @@
 package me.tyler.kbg;
 
+import me.tyler.kbg.util.ButtonBuilder;
+import me.tyler.kbg.util.click.ClickType;
+
 import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class KBG extends JPanel {
 
@@ -18,10 +21,19 @@ public class KBG extends JPanel {
 
     private final Map<Integer, List<Integer>> movieActors;
     private final AtomicInteger connections;
+    private boolean loaded;
 
     public KBG() {
+        this.loaded = false;
         final JFrame frame = new JFrame();
+        frame.setName("Kevin Bacon Game");
+        frame.setResizable(false);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setSize(600, 600);
+
+        setupComponents();
         frame.add(this);
+        frame.setVisible(true);
 
         this.graph = new LabeledGraph<>();
 
@@ -37,9 +49,8 @@ public class KBG extends JPanel {
 
 //        System.out.println("Will Smith has " + this.graph.vertices.get(2888).edges.size() + " edges");
 
+        this.loaded = true;
         System.out.println(String.format("There are %s connections", connections.get()));
-
-        frame.setVisible(true);
     }
 
     private void loadActors() {
@@ -101,6 +112,57 @@ public class KBG extends JPanel {
         }catch(Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void setupComponents() {
+        final JPanel container = new JPanel();
+        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
+
+        final JPanel buttonContainer = new JPanel();
+        buttonContainer.setLayout(new BoxLayout(buttonContainer, BoxLayout.X_AXIS));
+
+        final JPanel inputContainer = new JPanel();
+
+        final JTextArea inputAreaOne = new JTextArea();
+        inputAreaOne.setPreferredSize(new Dimension(237, 25));
+        inputAreaOne.setEditable(true);
+
+        final JTextArea inputAreaTwo = new JTextArea();
+        inputAreaTwo.setPreferredSize(new Dimension(237, 25));
+        inputAreaTwo.setEditable(true);
+
+        Arrays.asList(
+                inputAreaOne,
+                inputAreaTwo
+        ).forEach(inputContainer::add);
+
+        final JTextArea responseArea = new JTextArea();
+        responseArea.setPreferredSize(new Dimension(475, 600));
+        responseArea.setEditable(false);
+
+        buttonContainer.add(new ButtonBuilder("Path", (type, event) -> {
+            if (type == ClickType.CLICKED) {
+                if(!this.loaded) {
+                    responseArea.setText("The program is still loading");
+                    return;
+                }
+
+                if(inputAreaOne.getText().length() == 0 | inputAreaTwo.getText().length() == 0) {
+                    responseArea.setText("You must supply the name of two actors");
+                    return;
+                }
+
+                final List<String> path = graph.path(inputAreaOne.getText(), inputAreaTwo.getText());
+                responseArea.setText(String.join("\n", path));
+            }
+        }).build());
+
+        Arrays.asList(
+                buttonContainer,
+                inputContainer,
+                responseArea
+        ).forEach(container::add);
+        this.add(container);
     }
 
     public static void main(String[] args) {
