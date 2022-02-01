@@ -1,6 +1,10 @@
 package me.tyler.kbg;
 
+import me.tyler.kbg.util.Path;
+
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class LabeledGraph<E, T> {
@@ -61,11 +65,73 @@ public class LabeledGraph<E, T> {
         }
     }
 
-    public List<String> path(E start, E end) {
+    public E mostConnections() {
+        return this.vertexWithMostConnections().getInfo();
+    }
+
+    private Vertex vertexWithMostConnections() {
+        final AtomicReference<Vertex> ref = new AtomicReference<>();
+        vertices.values().forEach(vertex -> {
+            if(ref.get() == null) {
+                ref.set(vertex);
+                return;
+            }
+            if(ref.get() == vertex) return;
+            if(this.connections(vertex).size() > this.connections(vertex).size()) ref.set(vertex);
+        });
+
+        return ref.get();
+    }
+
+    public List<E> connections(E start) {
+        return this.connections(vertices.get(start)).stream().map(Vertex::getInfo).collect(Collectors.toList());
+    }
+
+    private List<Vertex> connections(Vertex start) {
+        final List<Vertex> directConnections = new ArrayList<>();
+
+        start.edges.forEach(edge -> {
+            directConnections.add(edge.getNeighbor(start));
+        });
+
+        return directConnections;
+    }
+
+    public List<Path> path(E start, E end) {
         return this.path(vertices.get(start), vertices.get(end));
     }
 
-    private List<String> path(Vertex start, Vertex end) {
+    private Vertex furthest(Vertex start) {
+        Vertex curr = start;
+        final LinkedList<Vertex> queue = new LinkedList<>();
+        final Map<Vertex, Integer> leadsTo = new HashMap<>();
+        queue.add(curr);
+        leadsTo.put(curr, null);
+        while(!queue.isEmpty()) {
+            curr = queue.poll();
+
+            for(Edge edge : curr.edges) {
+                Vertex nonCur = edge.getNeighbor(curr);
+                if(!leadsTo.containsKey(nonCur)) {
+                    queue.add(nonCur);
+                    final AtomicInteger value = new AtomicInteger(1);
+                    if(leadsTo.get(curr) != null) value.set(leadsTo.get(curr)+1);
+                    leadsTo.put(nonCur, value.get());
+                }
+            }
+        }
+
+        System.out.println(String.format("The distance from %s to %s was %s", start.getInfo(), curr.getInfo(), leadsTo.getOrDefault(curr, 0)));
+        return curr;
+    }
+
+    public E furthest(E start) {
+        return this.furthest(vertices.get(start)).getInfo();
+    }
+
+
+
+    private List<Path> path(Vertex start, Vertex end) {
         Vertex curr = start;
         // Key - Vertex
         // Value - The vertex that lead to Key
@@ -92,14 +158,18 @@ public class LabeledGraph<E, T> {
         return Collections.emptyList();
     }
 
-    public List<String> backtrace(Map<Vertex, Edge> leadsTo, Vertex endVertex) {
-        final List<String> path = new ArrayList<>();
+    public List<Path> backtrace(Map<Vertex, Edge> leadsTo, Vertex endVertex) {
+        final List<Path> path = new ArrayList<>();
         Vertex curr = endVertex;
 
         while(curr != null) {
             Edge edge = leadsTo.get(curr);
             if(edge == null) break;
-            path.add(curr.getInfo() + " is connected to " + edge.getNeighbor(curr).getInfo() + " thru " + edge.label);
+            path.add(new Path(
+                    curr.getInfo().toString(),
+                    edge.getNeighbor(curr).getInfo().toString(),
+                    edge.label.toString()
+            ));
             curr = edge.getNeighbor(curr);
         }
 
