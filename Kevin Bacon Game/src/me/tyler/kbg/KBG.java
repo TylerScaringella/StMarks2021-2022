@@ -34,6 +34,7 @@ public class KBG extends JPanel {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setSize(600, 600);
 
+        // Add frame content
         setupComponents();
         frame.add(this);
         frame.setVisible(true);
