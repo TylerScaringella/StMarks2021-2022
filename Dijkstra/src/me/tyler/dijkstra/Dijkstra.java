@@ -1,5 +1,7 @@
 package me.tyler.dijkstra;
 
+import java.util.stream.Collectors;
+
 public class Dijkstra {
 
     public static void main(String[] args) {
@@ -20,5 +22,7 @@ public class Dijkstra {
         graph.connect(a, e, 1);
         graph.connect(e, d, 2);
         graph.connect(d, c, 1);
+
+        System.out.println(String.join(", ", graph.path(a, c)));
     }
 }
