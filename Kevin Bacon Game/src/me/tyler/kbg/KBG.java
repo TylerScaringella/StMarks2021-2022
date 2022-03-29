@@ -38,7 +38,7 @@ public class KBG extends JPanel {
         setupComponents();
         frame.add(this);
         frame.setVisible(true);
-
+    
         this.graph = new LabeledGraph<>();
 
         // Initialize caches
