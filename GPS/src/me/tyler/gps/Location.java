@@ -38,4 +38,12 @@ public class Location {
     public String toString() {
         return name + " | " + x + ","+ y;
     }
+
+    public double distance(Location location) {
+        return distance(location.getX(), location.getY());
+    }
+
+    public double distance(int x, int y) {
+        return Math.sqrt(Math.pow((getY() - y), 2) + Math.pow((getX() - x), 2));
+    }
 }

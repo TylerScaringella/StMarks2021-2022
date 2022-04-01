@@ -1,7 +1,10 @@
 package me.tyler.gps;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class LocationGraph<E, T> {
 
@@ -19,6 +22,19 @@ public class LocationGraph<E, T> {
         Vertex vertex = new Vertex(info);
         this.vertices.put(info, vertex);
         return info;
+
+    }
+
+    private void forEach(BiConsumer<E, Vertex> consumer) {
+        this.vertices.forEach(consumer);
+    }
+
+    public void forEach(Consumer<E> consumer) {
+        this.vertices.keySet().forEach(consumer);
+    }
+
+    public Stream<E> stream() {
+        return this.vertices.keySet().stream();
     }
 
     public boolean contains(E info) {
@@ -134,6 +150,8 @@ public class LocationGraph<E, T> {
 //        });
 //        System.out.println("--------------------------------");
 //    }
+
+
 
     private class Vertex {
         private E info;

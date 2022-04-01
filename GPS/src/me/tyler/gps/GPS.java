@@ -1,22 +1,14 @@
 package me.tyler.gps;
 
-import com.sun.glass.ui.Screen;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.File;
 
-public class GPS extends JPanel implements MouseListener, KeyListener {
+public class GPS extends JPanel implements MouseListener {
 
     private final LocationGraph<Location, Integer> map;
-    private final JTextField nameField;
     private final Image backgroundImage;
-
-    private Location editingLocation;
 
     public static void main(String[] args) {
         new GPS();
@@ -36,64 +28,64 @@ public class GPS extends JPanel implements MouseListener, KeyListener {
         frame.getContentPane().add(this);
 
         this.addMouseListener(this);
-        this.nameField = new JTextField(NAME_FIELD_PLACEHOLDER);
-        this.nameField.setVisible(false);
-        this.nameField.setPreferredSize(new Dimension(100, 100));
-        this.nameField.setBackground(Color.GRAY);
-        this.add(nameField);
 
-        drawMap();
+        new ImageIcon(backgroundImage);
 
         frame.setVisible(true);
+        this.repaint();
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    public void paint(Graphics g) {
+        super.paint(g);
+        g.drawImage(
+                backgroundImage,
+                0,
+                0,
+                (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth(),
+                (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight(),
+                null);
+        renderMap(g);
     }
 
-    private void renderMap() {
+    private void renderMap(Graphics g) {
+        g.setColor(Color.RED);
+        map.forEach(location -> {
+            System.out.println("Drawing " + location.getName());
+            g.fillOval(
+                    location.getX()-DISTANCE_THRESHOLD,
+                    location.getY()-DISTANCE_THRESHOLD,
+                    DISTANCE_THRESHOLD*2,
+                    DISTANCE_THRESHOLD*2);
 
-    }
-
-    private void drawMap() {
-        // going to eventually need to load locations from file
-        // same thing goes for saving them on close
-
-        // draw image
-        final JLabel backgroundLabel = new JLabel(new ImageIcon(backgroundImage));
-        this.add(backgroundLabel);
-
-        renderMap();
+            g.drawString(location.getName(), location.getX()-15, location.getY()+15);
+        });
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        this.nameField.setVisible(true);
-        this.nameField.setText(NAME_FIELD_PLACEHOLDER);
+        if(isMouseOnLocation(e.getX(), e.getY())) return;
+        final String locationName = JOptionPane.showInputDialog(NAME_FIELD_PLACEHOLDER);
+        if(locationName == null || locationName.length() == 0) return;
+        map.add(new Location(
+                locationName,
+                e.getX(),
+                e.getY()));
 
-        this.editingLocation = new Location("", e.getX(), e.getY());
+        System.out.println(String.format("Created %s", locationName));
+        this.repaint();
     }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if(!nameField.isVisible()) return;
-        if(nameField.getText().equals(NAME_FIELD_PLACEHOLDER)) return;
-        if(editingLocation == null) return;
+    private boolean isMouseOnLocation(int x, int y) {
 
-        this.editingLocation.setName(nameField.getText());
-        this.map.add(this.editingLocation);
-        System.out.println("Added " + editingLocation.toString());
-        this.editingLocation = null;
-        renderMap();
+        return false;
     }
 
     @Override public void mousePressed(MouseEvent e) {}
     @Override public void mouseReleased(MouseEvent e) {}
     @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mouseExited(MouseEvent e) {}
-    @Override public void keyTyped(KeyEvent e) {}
-    @Override public void keyReleased(KeyEvent e) {}
 
     private static final String NAME_FIELD_PLACEHOLDER = "Name of location..";
+    private static final int DISTANCE_THRESHOLD = 7;
 }
