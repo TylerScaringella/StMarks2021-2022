@@ -1,212 +1,145 @@
 package me.tyler.gps;
 
+import java.awt.*;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
+import java.io.*;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public class LocationGraph<E, T> {
+import static me.tyler.gps.Constants.DISTANCE_THRESHOLD;
 
-    private final Map<E, Vertex> vertices;
+public class LocationGraph extends Graph<Location, Integer> {
 
-    public LocationGraph() {
-        this.vertices = new HashMap<>();
-    }
+    public LocationGraph(File file) {
+        super();
+        try {
+            final Map<Location, List<String>> connections = new HashMap<>();
 
-    public int size() {
-        return this.vertices.size();
-    }
+            final FileReader fileReader = new FileReader(file);
+            final BufferedReader reader = new BufferedReader(fileReader);
+            String line;
 
-    public E add(E info) {
-        Vertex vertex = new Vertex(info);
-        this.vertices.put(info, vertex);
-        return info;
+            while((line = reader.readLine()) != null) {
+                // data is split with
+                // name_with_spaces x y
+                // United_States 35 62
+                // with connections
+                // United_States 35 62 Brazil
+                // Brazil 86 13 United_States
+                final String[] data = line.split(" ");
+                final String name = data[0].replace("_", " ");
+                final Location loadedLocation = new Location(
+                        name,
+                        Integer.parseInt(data[1]),
+                        Integer.parseInt(data[2])
+                );
 
-    }
-
-    private void forEach(BiConsumer<E, Vertex> consumer) {
-        this.vertices.forEach(consumer);
-    }
-
-    public void forEach(Consumer<E> consumer) {
-        this.vertices.keySet().forEach(consumer);
-    }
-
-    public Stream<E> stream() {
-        return this.vertices.keySet().stream();
-    }
-
-    public boolean contains(E info) {
-        return this.vertices.containsKey(info);
-    }
-
-    public void connect(E one, E two, T label) {
-        final Vertex first = getVertex(one);
-        final Vertex second = getVertex(two);
-
-        final Edge edge = new Edge(
-                first,
-                second,
-                label
-        );
-
-        first.addEdge(edge);
-        second.addEdge(edge);
-    }
-
-    public List<Vertex> path(Vertex start, Vertex end) {
-        Vertex curr = start;
-        final Map<Vertex, Vertex> leadsTo = new HashMap<>();
-        final Set<Vertex> visited = new HashSet<>();
-        final Map<Vertex, Integer> distance = new HashMap<>();
-        final PriorityQueue<Vertex> toVisit = new PriorityQueue<>();
-        toVisit.put(curr, 0);
-        leadsTo.put(curr, null);
-
-        while(!toVisit.isEmpty()) {
-            curr = toVisit.pop();
-            visited.add(curr);
-
-            if(curr.equals(end)) {
-                return backtrace(leadsTo, end);
-            }
-
-            for(Edge edge : curr.getEdges()) {
-                final Vertex neighbor = edge.getNeighbor(curr);
-                if(visited.contains(neighbor)) continue;
-
-                final int currDistStart = distance.getOrDefault(curr, 0);
-                final int neighborDistPrev = edge.getLabel();
-
-                final int distFromStart = currDistStart + neighborDistPrev;
-                if(currDistStart < distFromStart) {
-                    distance.put(neighbor, distFromStart);
-                    toVisit.put(neighbor, distFromStart);
-                    leadsTo.put(neighbor, curr);
+                final List<String> curConnections = new ArrayList<>();
+                if(data.length > 3) {
+                    // has connections
+                    for(int i=3; i<data.length; i++) {
+                        final String connection = data[i]
+                                .replace("_", " ");
+                        curConnections.add(connection);
+                    }
                 }
+
+                final Location added = add(loadedLocation);
+                System.out.println(curConnections.toString());
+                connections.put(added, curConnections);
             }
 
+            reader.close();
+
+            connections.forEach((location, conn) -> {
+                final Vertex origin = getVertex(location);
+
+                conn.forEach(connection -> {
+                    final Vertex connVertex = getVertexFromInfo(connection);
+                    if(connVertex == null) return;
+                    if(origin.isConnected(connVertex)) return;
+
+                    connect(origin.getInfo(), connVertex.getInfo(), (int)origin.getInfo().distance(connVertex.getInfo()));
+                });
+            });
+        }catch(IOException ex) {
+            ex.printStackTrace();
         }
 
-        return Collections.emptyList();
-    }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                final FileWriter fileWriter = new FileWriter(file);
+                final BufferedWriter writer = new BufferedWriter(fileWriter);
+                vertices.forEach((location, vertex) -> {
+                    final String name = location.getName().replace(" ", "_");
+                    try {
+                        final String connString = vertex.getEdges()
+                                .stream()
+                                .map(edge -> edge.getNeighbor(vertex).getInfo())
+                                .map(Location::getName)
+                                .collect(Collectors.joining(" "));
+                        System.out.println(connString);
+                        writer.write(name + " " + location.getX() + " " + location.getY() + " " + connString + "\n");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
 
-    public List<E> path(E start, E end) {
-        return this.path(getVertex(start), getVertex(end)).stream()
-                .map(Vertex::getInfo).collect(Collectors.toList());
-    }
-
-//    private List<Vertex> path(Vertex start, Vertex end) {
-//        Vertex curr = start;
-//        // Key - Vertex
-//        // Value - The vertex that lead to Key
-//        final Map<Vertex, Vertex> leadsTo = new HashMap<>();
-//        final List<Vertex> toVisit = new ArrayList<>();
-//        toVisit.add(curr);
-//        leadsTo.put(curr, null);
-//        while(!toVisit.isEmpty()) {
-//            curr = toVisit.remove(0);
-//
-//            for(Edge edge : curr.getEdges()) {
-//                if(!leadsTo.containsKey(edge.getV1())) {
-//                    toVisit.add(edge.getV1());
-//                    leadsTo.put(edge.getV1(), curr);
-//                }
-//                if(edge.getV1().equals(end)) {
-//                    return backtrace(leadsTo, end);
-//                }
-//            }
-//        }
-//
-//        return Collections.emptyList();
-//    }
-
-    public List<Vertex> backtrace(Map<Vertex, Vertex> leadsTo, Vertex endVertex) {
-        final List<Vertex> path = new ArrayList<>();
-        Vertex curr = endVertex;
-
-        while(curr != null) {
-            path.add(curr);
-            curr = leadsTo.getOrDefault(curr, null);
-        }
-
-        Collections.reverse(path);
-        return path;
-    }
-
-    private Vertex getVertex(E info) {
-        if(!contains(info)) throw new NullPointerException("Data is not a member of the graph");
-        return this.vertices.get(info);
-    }
-
-//    public void debug() {
-//        this.vertices.values().forEach(value -> {
-//            System.out.println("--------------------------------");
-//            System.out.println(
-//                    "Info: " + value.getInfo() + "\n" +
-//                            "Neighbors: " + value.getNeighbors().stream().map(Vertex::getInfo).map(E::toString).collect(Collectors.joining(","))
-//            );
-//        });
-//        System.out.println("--------------------------------");
-//    }
-
-
-
-    private class Vertex {
-        private E info;
-        private Set<Edge> edges;
-
-        public Vertex(E info) {
-            this.info = info;
-            this.edges = new HashSet<>();
-        }
-
-        public Edge addEdge(Edge edge) {
-            this.edges.add(edge);
-            return edge;
-        }
-
-        public E getInfo() {
-            return info;
-        }
-
-        public Set<Edge> getEdges() {
-            return edges;
-        }
-    }
-
-    private class Edge {
-        private Vertex v1, v2;
-        private T info;
-
-        public Edge(Vertex v1, Vertex v2, T info) {
-            this.v1 = v1;
-            this.v2 = v2;
-            this.info = info;
-        }
-
-        public Vertex getV1() {
-            return v1;
-        }
-
-        public Vertex getV2() {
-            return v2;
-        }
-
-        public T getInfo() {
-            return info;
-        }
-
-        public int getLabel() {
-            return Integer.parseInt(this.info.toString());
-        }
-
-        public Vertex getNeighbor(Vertex v) {
-            if (v.info.equals(v1.info)) {
-                return v2;
+                writer.close();
+            }catch(IOException ex) {
+                ex.printStackTrace();
             }
-            return v1;
-        }
+        }));
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        g.setColor(Color.RED);
+        vertices.forEach((location, vertex) -> {
+            System.out.println("Drawing " + location.getName());
+            g.fillOval(location.getX() - DISTANCE_THRESHOLD, location.getY() - DISTANCE_THRESHOLD, DISTANCE_THRESHOLD * 2, DISTANCE_THRESHOLD * 2);
+
+            g.drawString(location.getName(), location.getX() - 15, location.getY() + 20);
+
+            vertex.getEdges().forEach(edge -> {
+                final Vertex neighbor = edge.getNeighbor(vertex);
+                final Location neighborLocation = neighbor.getInfo();
+                // draw line from current to neighbor
+                g.drawLine(
+                        location.getX(), location.getY(),
+                        neighborLocation.getX(), neighborLocation.getY()
+                );
+            });
+        });
+    }
+
+    public void drawPath(Graphics g, List<Location> route) {
+        System.out.println("drawing path");
+        g.setColor(Color.GREEN);
+        final Graphics2D g2d = (Graphics2D) g;
+        AtomicBoolean startSet = new AtomicBoolean(false);
+        final GeneralPath path = new GeneralPath();
+        route.forEach(location -> {
+            if(!startSet.get()) {
+                path.moveTo(location.getX(), location.getY());
+                startSet.set(true);
+                return;
+            }
+
+            path.lineTo(location.getX(), location.getY());
+            System.out.println("line to " + location.getX() + " | " + location.getY());
+        });
+
+        path.closePath();
+        g2d.draw(path);
+    }
+
+    private Vertex getVertexFromInfo(String info) {
+        return this.vertices.values().stream().filter(vertex -> {
+            return vertex.getInfo().getName().equals(info);
+        }).findFirst().orElse(null);
     }
 }

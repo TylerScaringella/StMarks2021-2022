@@ -1,19 +1,29 @@
 package me.tyler.gps;
 
+import me.tyler.gps.util.ButtonBuilder;
+import me.tyler.gps.util.click.ClickType;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static me.tyler.gps.Constants.GRAPH_FILE_NAME;
+import static me.tyler.gps.Constants.DISTANCE_THRESHOLD;
+import static me.tyler.gps.Constants.NAME_FIELD_PLACEHOLDER;
 
 public class GPS extends JPanel implements MouseListener {
 
-    private final LocationGraph<Location, Integer> map;
+    private final LocationGraph map;
     private final Image backgroundImage;
     private final File file;
 
     private Location initialConnectionClick;
-    private boolean connectionMode;
+    private boolean connectionMode, editMode;
+    private List<Location> path;
 
     public static void main(String[] args) {
         new GPS();
@@ -21,9 +31,8 @@ public class GPS extends JPanel implements MouseListener {
 
     public GPS() {
         this.file = new File(GRAPH_FILE_NAME);
-        this.map = new LocationGraph<>();
+        this.map = new LocationGraph(file);
         this.backgroundImage = Toolkit.getDefaultToolkit().getImage("C:\\Users\\tjsca\\Documents\\cs\\GPS\\st marks aerial.jpg");
-        registerVertexPersistence();
         final JFrame frame = new JFrame();
 
         frame.setName("GPS");
@@ -33,6 +42,14 @@ public class GPS extends JPanel implements MouseListener {
         frame.setLocationRelativeTo(null);
 
         frame.getContentPane().add(this);
+        this.add(new ButtonBuilder("GPS Mode", (type, event) -> {
+            if(type == ClickType.CLICKED)
+                editMode = false;
+        }).build());
+        this.add(new ButtonBuilder("Edit Mode", (type, event) -> {
+            if(type == ClickType.CLICKED)
+                editMode = true;
+        }).build());
 
         this.addMouseListener(this);
 
@@ -56,21 +73,34 @@ public class GPS extends JPanel implements MouseListener {
     }
 
     private void renderMap(Graphics g) {
-        g.setColor(Color.RED);
-        map.forEach(location -> {
-            System.out.println("Drawing " + location.getName());
-            g.fillOval(
-                    location.getX()-DISTANCE_THRESHOLD,
-                    location.getY()-DISTANCE_THRESHOLD,
-                    DISTANCE_THRESHOLD*2,
-                    DISTANCE_THRESHOLD*2);
+        map.draw(g);
+        if(path != null) map.drawPath(g, path);
+    }
 
-            g.drawString(location.getName(), location.getX()-15, location.getY()+20);
-        });
+    private void gpsMouseClick(MouseEvent e) {
+        if(isMouseOnLocation(e.getX(), e.getY())) {
+            final Location clickedLocation = getLocation(e.getX(), e.getY());
+
+            if(initialConnectionClick == null) {
+                initialConnectionClick = clickedLocation;
+                this.path = null;
+                return;
+            }
+
+            final List<Location> path = map.path(initialConnectionClick, clickedLocation);
+            System.out.println(path
+                    .stream()
+                    .map(Location::getName)
+                    .collect(Collectors.joining(", ")));
+            this.path = path;
+            initialConnectionClick = null;
+            this.repaint();
+        }
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        if(!editMode) gpsMouseClick(e);
         if(isMouseOnLocation(e.getX(), e.getY())) {
             if(connectionMode) {
                 connectionClick(e);
@@ -105,56 +135,7 @@ public class GPS extends JPanel implements MouseListener {
         System.out.println(String.format("Connected %s with %s", initialConnectionClick.getName(), clickedLocation.getName()));
         map.connect(initialConnectionClick, clickedLocation, (int) initialConnectionClick.distance(clickedLocation));
         initialConnectionClick = null;
-    }
-
-    private void registerVertexPersistence() {
-        loadVertices();
-        Runtime.getRuntime().addShutdownHook(new Thread(this::saveVertices));
-    }
-
-    private void loadVertices() {
-        try {
-            final FileReader fileReader = new FileReader(file);
-            final BufferedReader reader = new BufferedReader(fileReader);
-            String line;
-
-            while((line = reader.readLine()) != null) {
-                // data is split with
-                // name_with_spaces x y
-                // United_States 35 62
-                final String[] data = line.split(" ");
-                final Location loadedLocation = new Location(
-                        data[0],
-                        Integer.parseInt(data[1]),
-                        Integer.parseInt(data[2])
-                );
-
-                map.add(loadedLocation);
-            }
-
-            reader.close();
-        }catch(IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private void saveVertices() {
-        try {
-            final FileWriter fileWriter = new FileWriter(file);
-            final BufferedWriter writer = new BufferedWriter(fileWriter);
-            map.forEach(location -> {
-                final String name = location.getName().replace(" ", "_");
-                try {
-                    writer.write(name + " " + location.getX() + " " + location.getY() + "\n");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-
-            writer.close();
-        }catch(IOException ex) {
-            ex.printStackTrace();
-        }
+        this.repaint();
     }
 
     private boolean isMouseOnLocation(int x, int y) {
@@ -174,7 +155,4 @@ public class GPS extends JPanel implements MouseListener {
     @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mouseExited(MouseEvent e) {}
 
-    private static final String NAME_FIELD_PLACEHOLDER = "Name of location..";
-    private static final String GRAPH_FILE_NAME = "graph.txt";
-    private static final int DISTANCE_THRESHOLD = 7;
 }
