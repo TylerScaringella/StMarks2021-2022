@@ -59,7 +59,7 @@ public abstract class Graph<E, T> {
         second.addEdge(edge);
     }
 
-    public List<Vertex> path(Vertex start, Vertex end) {
+    public Path path(Vertex start, Vertex end) {
         Vertex curr = start;
         final Map<Vertex, Vertex> leadsTo = new HashMap<>();
         final Set<Vertex> visited = new HashSet<>();
@@ -73,7 +73,10 @@ public abstract class Graph<E, T> {
             visited.add(curr);
 
             if(curr.equals(end)) {
-                return backtrace(leadsTo, end);
+                final List<Vertex> path = backtrace(leadsTo, end);
+                return new Path(
+                        path.stream().map(Vertex::getInfo).collect(Collectors.toList()),
+                        distance.get(end));
             }
 
             for(Edge edge : curr.getEdges()) {
@@ -93,12 +96,29 @@ public abstract class Graph<E, T> {
 
         }
 
-        return Collections.emptyList();
+        return null;
     }
 
-    public List<E> path(E start, E end) {
-        return this.path(getVertex(start), getVertex(end)).stream()
-                .map(Vertex::getInfo).collect(Collectors.toList());
+    public Path path(E start, E end) {
+        return this.path(getVertex(start), getVertex(end));
+    }
+
+    public class Path {
+        private final List<E> path;
+        private final int distance;
+
+        public Path(List<E> path, int distance) {
+            this.path = path;
+            this.distance = distance;
+        }
+
+        public List<E> getPath() {
+            return path;
+        }
+
+        public int getDistance() {
+            return distance;
+        }
     }
 
     public List<Vertex> backtrace(Map<Vertex, Vertex> leadsTo, Vertex endVertex) {

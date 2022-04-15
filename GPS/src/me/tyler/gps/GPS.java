@@ -22,6 +22,7 @@ public class GPS extends JPanel implements MouseListener {
     private final File file;
 
     private Location initialConnectionClick;
+    private int renderDistance;
     private boolean connectionMode, editMode;
     private List<Location> path;
 
@@ -77,6 +78,7 @@ public class GPS extends JPanel implements MouseListener {
         g.setFont(new Font("Roboto", Font.BOLD, 15));
         g.setColor(Color.WHITE);
         g.drawString(getModeText(), (int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2)-275, 25);
+        g.drawString("Last Distance: " + this.renderDistance, (int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2)-275, 40);
     }
 
     private void renderMap(Graphics g) {
@@ -94,7 +96,10 @@ public class GPS extends JPanel implements MouseListener {
                 return;
             }
 
-            final List<Location> path = map.path(initialConnectionClick, clickedLocation);
+            final Graph.Path pathObj = map.path(initialConnectionClick, clickedLocation);
+            final List<Location> path = pathObj.getPath();
+            this.renderDistance = pathObj.getDistance();
+
             System.out.println(path
                     .stream()
                     .map(Location::getName)
