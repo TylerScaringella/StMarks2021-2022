@@ -43,12 +43,16 @@ public class GPS extends JPanel implements MouseListener {
 
         frame.getContentPane().add(this);
         this.add(new ButtonBuilder("GPS Mode", (type, event) -> {
-            if(type == ClickType.CLICKED)
+            if(type == ClickType.CLICKED) {
                 editMode = false;
+                this.repaint();
+            }
         }).build());
         this.add(new ButtonBuilder("Edit Mode", (type, event) -> {
-            if(type == ClickType.CLICKED)
+            if(type == ClickType.CLICKED) {
                 editMode = true;
+                this.repaint();
+            }
         }).build());
 
         this.addMouseListener(this);
@@ -60,8 +64,8 @@ public class GPS extends JPanel implements MouseListener {
     }
 
     @Override
-    public void paint(Graphics g) {
-        super.paint(g);
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         g.drawImage(
                 backgroundImage,
                 0,
@@ -70,6 +74,9 @@ public class GPS extends JPanel implements MouseListener {
                 (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight(),
                 null);
         renderMap(g);
+        g.setFont(new Font("Roboto", Font.BOLD, 15));
+        g.setColor(Color.WHITE);
+        g.drawString(getModeText(), (int)(Toolkit.getDefaultToolkit().getScreenSize().getWidth()/2)-275, 25);
     }
 
     private void renderMap(Graphics g) {
@@ -132,6 +139,7 @@ public class GPS extends JPanel implements MouseListener {
             return;
         }
 
+        if(initialConnectionClick.getName().equals(clickedLocation.getName())) return;
         System.out.println(String.format("Connected %s with %s", initialConnectionClick.getName(), clickedLocation.getName()));
         map.connect(initialConnectionClick, clickedLocation, (int) initialConnectionClick.distance(clickedLocation));
         initialConnectionClick = null;
@@ -150,9 +158,13 @@ public class GPS extends JPanel implements MouseListener {
                 .orElse(null);
     }
 
+    private String getModeText() {
+        return "Current Mode: " + (editMode ? "Editing" : "GPS");
+    }
+
+    @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mousePressed(MouseEvent e) {}
     @Override public void mouseReleased(MouseEvent e) {}
-    @Override public void mouseEntered(MouseEvent e) {}
     @Override public void mouseExited(MouseEvent e) {}
 
 }

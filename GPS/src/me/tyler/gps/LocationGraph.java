@@ -80,6 +80,7 @@ public class LocationGraph extends Graph<Location, Integer> {
                                 .stream()
                                 .map(edge -> edge.getNeighbor(vertex).getInfo())
                                 .map(Location::getName)
+                                .map(connName -> connName.replace(" ", "_"))
                                 .collect(Collectors.joining(" "));
                         System.out.println(connString);
                         writer.write(name + " " + location.getX() + " " + location.getY() + " " + connString + "\n");
@@ -99,7 +100,6 @@ public class LocationGraph extends Graph<Location, Integer> {
     public void draw(Graphics g) {
         g.setColor(Color.RED);
         vertices.forEach((location, vertex) -> {
-            System.out.println("Drawing " + location.getName());
             g.fillOval(location.getX() - DISTANCE_THRESHOLD, location.getY() - DISTANCE_THRESHOLD, DISTANCE_THRESHOLD * 2, DISTANCE_THRESHOLD * 2);
 
             g.drawString(location.getName(), location.getX() - 15, location.getY() + 20);
@@ -125,6 +125,7 @@ public class LocationGraph extends Graph<Location, Integer> {
         route.forEach(location -> {
             if(!startSet.get()) {
                 path.moveTo(location.getX(), location.getY());
+                System.out.println("move to");
                 startSet.set(true);
                 return;
             }
@@ -133,7 +134,6 @@ public class LocationGraph extends Graph<Location, Integer> {
             System.out.println("line to " + location.getX() + " | " + location.getY());
         });
 
-        path.closePath();
         g2d.draw(path);
     }
 
