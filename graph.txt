@@ -1,22 +1,22 @@
-PFAC 1105 104 Class_of_45_Hall Path
-Main_Hallway 518 226 Center Small_Dining_Hall Dining_Hall_Entrance Sawyer Lions_Den
-Crypt 130 146 Cloisters Chapel
-Cloisters 182 280 Crypt Front_Desk Chapel_Entrance Front_Circle
-Class_of_45_Hall 1060 3 Path PFAC
-Chapel_Entrance 262 133 Cloisters Chapel
-Cage 1002 661 Athletic_Quad
-Benson 965 239 Athletic_Quad
 STEM 828 121 Center
-Athletic_Quad 884 461 Elkins Lions_Den Benson Path Cage
-Elkins 1204 487 Athletic_Quad
-Front_Circle 23 236 Cloisters
-Admissions 3 415 Front_Desk
-Center 622 285 Main_Hallway STEM
-Front_Desk 36 418 Cloisters Admissions Dining_Hall_Entrance
-Dining_Hall_Entrance 262 487 Main_Hallway Front_Desk Dining_Hall
-Chapel 164 111 Crypt Chapel_Entrance
-Dining_Hall 524 555 Small_Dining_Hall Dining_Hall_Entrance
-Lions_Den 532 399 Athletic_Quad Path Main_Hallway
-Small_Dining_Hall 441 444 Main_Hallway Dining_Hall
-Path 873 241 Class_of_45_Hall Athletic_Quad Lions_Den PFAC
+Athletic_Quad 884 461 Cage Elkins Path Benson Lions_Den
+Dining_Hall_Entrance 262 487 Dining_Hall Main_Hallway Front_Desk
 Sawyer 360 112 Main_Hallway
+Chapel_Entrance 262 133 Chapel Cloisters
+PFAC 1105 104 Path Class_of_45_Hall
+Benson 965 239 Athletic_Quad
+Small_Dining_Hall 441 444 Main_Hallway Dining_Hall
+Dining_Hall 524 555 Dining_Hall_Entrance Small_Dining_Hall
+Center 622 285 STEM Main_Hallway
+Main_Hallway 518 226 Sawyer Center Lions_Den Small_Dining_Hall Dining_Hall_Entrance
+Front_Desk 36 418 Cloisters Admissions Dining_Hall_Entrance
+Elkins 1204 487 Athletic_Quad
+Crypt 130 146 Cloisters Chapel
+Chapel 164 111 Chapel_Entrance Crypt
+Admissions 3 415 Front_Desk
+Lions_Den 532 399 Main_Hallway Athletic_Quad Path
+Class_of_45_Hall 1060 3 Path PFAC
+Path 873 241 PFAC Athletic_Quad Class_of_45_Hall Lions_Den
+Cloisters 182 280 Crypt Front_Desk Chapel_Entrance Front_Circle
+Front_Circle 23 236 Cloisters
+Cage 1002 661 Athletic_Quad
