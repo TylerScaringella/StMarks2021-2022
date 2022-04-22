@@ -32,6 +32,7 @@ public class CannibalState {
      */
     public Set<CannibalState> getNextStates() {
         final Set<CannibalState> states = new HashSet<>();
+
         // I think that we can assume that the maximum we will change the side values by will be 2
         for(int i = 0; i<(boatSide == BoatSide.LEFT ? leftMissionaries : rightMissionaries); i++) {
             for(int x=0; x<(boatSide == BoatSide.LEFT ? leftCannibals : rightCannibals); x++) {
@@ -52,6 +53,32 @@ public class CannibalState {
                 .stream()
                 .filter(CannibalState::isLegal)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     *
+     * @param depth
+     * @return - Steps
+     */
+    public List<CannibalState> solve(int depth, Set<CannibalState> prev) {
+        if(depth > MAX_DEPTH) return null;
+        depth+=1;
+
+        if(this.isEnd())
+            // not actually what we'll be returning
+            return Collections.singletonList(this);
+
+        for(CannibalState state : getNextStates()) {
+            if(prev.contains(state)) continue;
+            prev.add(state);
+
+            final List<CannibalState> solve = state.solve(depth, prev);
+            if(solve != null) {
+                return solve;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -91,8 +118,21 @@ public class CannibalState {
                 rightCannibals);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CannibalState that = (CannibalState) o;
+        return leftMissionaries == that.leftMissionaries && rightMissionaries == that.rightMissionaries && leftCannibals == that.leftCannibals && rightCannibals == that.rightCannibals && boatSide == that.boatSide;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(leftMissionaries, rightMissionaries, leftCannibals, rightCannibals, boatSide);
+    }
+
     private static final int MISSIONARY_TOTAL = 3;
     private static final int CANNIBAL_TOTAL = 3;
-
     private static final int TOTAL = MISSIONARY_TOTAL + CANNIBAL_TOTAL;
+    private static final int MAX_DEPTH = 1000;
 }
