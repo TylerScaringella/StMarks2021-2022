@@ -3,78 +3,74 @@ package me.tyler.cam;
 import me.tyler.cam.side.BoatSide;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CannibalState {
     private final int leftMissionaries, rightMissionaries, leftCannibals, rightCannibals;
     private final BoatSide boatSide;
 
-    public CannibalState(
-            int leftMissionaries,
-            int rightMissionaries,
-            int leftCannibals,
-            int rightCannibals,
-            BoatSide boatSide) {
-        this.leftMissionaries = leftMissionaries;
-        this.rightMissionaries = rightMissionaries;
-        this.leftCannibals = leftCannibals;
-        this.rightCannibals = rightCannibals;
-        this.boatSide = boatSide;
+    public CannibalState(int nmL, int ncL, int nmR, int ncR, BoatSide side) {
+        this.leftMissionaries = nmL;
+        this.rightMissionaries = nmR;
+        this.leftCannibals = ncL;
+        this.rightCannibals = ncR;
+        this.boatSide = side;
     }
 
     public CannibalState(int missionaries, int cannibals) {
-        this(missionaries, 0, cannibals, 0, BoatSide.LEFT);
+        this(missionaries, cannibals, 0, 0, BoatSide.LEFT);
     }
 
     /**
      *
      * @return - Every single possible solution that could occur, coming from this state
      */
-    public Set<CannibalState> getNextStates() {
-        final Set<CannibalState> states = new HashSet<>();
+    public HashSet<CannibalState> getNextStates() {
+        final HashSet<CannibalState> nexts = new HashSet<>();
+        for (int nm = 0; nm <= Math.min(2, boatSide == BoatSide.LEFT ?
+                this.leftMissionaries : this.rightMissionaries); nm++) {
+            for (int nc = (nm==0 ? 1 : 0); nc <= Math.min(2 - nm,
+                    boatSide == BoatSide.LEFT ? this.leftCannibals : this.rightCannibals); nc++) {
 
-        // I think that we can assume that the maximum we will change the side values by will be 2
-        for(int i = 0; i<(boatSide == BoatSide.LEFT ? leftMissionaries : rightMissionaries); i++) {
-            for(int x=0; x<(boatSide == BoatSide.LEFT ? leftCannibals : rightCannibals); x++) {
-                if(i + x > 2 || i+x == 0) continue;
-
-                final CannibalState state = new CannibalState(
-                        i,
-                        rightMissionaries+i,
-                        x,
-                        rightCannibals+x,
-                        boatSide == BoatSide.LEFT ? BoatSide.RIGHT : BoatSide.LEFT
-                );
-                states.add(state);
+                CannibalState next;
+                if (boatSide == BoatSide.LEFT)
+                    next = new CannibalState(this.leftMissionaries -
+                            nm, this.leftCannibals - nc, this.rightMissionaries + nm,
+                            this.rightCannibals + nc, BoatSide.RIGHT);
+                else
+                    next = new
+                            CannibalState(this.leftMissionaries+nm, this.leftCannibals + nc,
+                            this.rightMissionaries - nm, this.rightCannibals - nc, BoatSide.LEFT);
+                if (next.isLegal())
+                    nexts.add(next);
             }
         }
-
-        return states
-                .stream()
-                .filter(CannibalState::isLegal)
-                .collect(Collectors.toSet());
+        return nexts;
     }
 
     /**
      *
-     * @param depth
+     * @param depth - The current depth in the search
+     * @param prev - The current depth
+     * @param soln - The legal states
      * @return - Steps
      */
-    public List<CannibalState> solve(int depth, Set<CannibalState> prev) {
+    public List<CannibalState> solve(int depth, Set<CannibalState> prev, List<CannibalState> soln) {
         if(depth > MAX_DEPTH) return null;
         depth+=1;
 
-        if(this.isEnd())
-            // not actually what we'll be returning
-            return Collections.singletonList(this);
+        if(this.isEnd()) {
+            soln.add(this);
+            return soln;
+        }
 
         for(CannibalState state : getNextStates()) {
             if(prev.contains(state)) continue;
             prev.add(state);
 
-            final List<CannibalState> solve = state.solve(depth, prev);
+            final List<CannibalState> solve = state.solve(depth, prev, soln);
             if(solve != null) {
-                return solve;
+                soln.add(this);
+                return soln;
             }
         }
 
@@ -87,8 +83,7 @@ public class CannibalState {
      * @return - The state is the end state
      */
     public boolean isEnd() {
-        return rightCannibals == 3
-                && rightMissionaries == 0;
+        return leftMissionaries == 0 && leftCannibals == 0;
     }
 
     /**
@@ -98,15 +93,13 @@ public class CannibalState {
      * @return - The state is legal
      */
     public boolean isLegal() {
-        // Ensure that there are never less missionaries than there are cannibals
-        final boolean missionariesEaten = leftMissionaries >= leftCannibals
-                && rightMissionaries >= rightCannibals;
-
-        // Ensure that the total number of missionaries & cannibals never exceed 3 for each of them
-        final boolean totalCorrect = (leftMissionaries + rightMissionaries <= MISSIONARY_TOTAL)
-                && (leftCannibals + rightCannibals <= CANNIBAL_TOTAL);
-
-        return missionariesEaten && totalCorrect;
+        if (!(this.leftCannibals >= 0 && this.leftMissionaries >= 0 &&
+                this.rightCannibals >= 0 && this.rightMissionaries >= 0)) return false;
+        if (this.leftCannibals > this.leftMissionaries &&
+                this.leftMissionaries > 0) return false;
+        if (this.rightCannibals > this.rightMissionaries &&
+                this.rightMissionaries > 0) return false;
+        return true;
     }
 
     @Override
@@ -131,8 +124,6 @@ public class CannibalState {
         return Objects.hash(leftMissionaries, rightMissionaries, leftCannibals, rightCannibals, boatSide);
     }
 
-    private static final int MISSIONARY_TOTAL = 3;
-    private static final int CANNIBAL_TOTAL = 3;
-    private static final int TOTAL = MISSIONARY_TOTAL + CANNIBAL_TOTAL;
+
     private static final int MAX_DEPTH = 1000;
 }

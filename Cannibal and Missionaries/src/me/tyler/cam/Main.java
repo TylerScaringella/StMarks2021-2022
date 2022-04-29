@@ -1,5 +1,6 @@
 package me.tyler.cam;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -8,14 +9,13 @@ public class Main {
 
     public static void main(String[] args) {
         final Set<CannibalState> prev = new HashSet<>();
-        final CannibalState startState = new CannibalState(3,3);
+        final CannibalState startState = new CannibalState(5,4);
         prev.add(startState);
 
-        System.out.println(startState.getNextStates()
-            .stream()
-            .map(CannibalState::toString)
-            .collect(Collectors.joining("\n")));
-
-        startState.solve(0, prev);
+        System.out.println(
+                startState.solve(0, prev, new ArrayList<>())
+                        .stream()
+                        .map(CannibalState::toString)
+                        .collect(Collectors.joining("\n")));
     }
 }
