@@ -43,11 +43,11 @@ class RingState {
     fun getNextStates(): HashSet<RingState> {
         val states = HashSet<RingState>()
 
-        for(i in 0..this.towers.size) {
+        for(i in 0 until (this.towers.size-1)) {
             val tower = towers[i]
             if(tower.size == 0) continue
 
-            for(x in 0..towers.size) {
+            for(x in 0 until (towers.size-1)) {
                 val towers = this.copy()
                 val value = towers[i].removeAt(0)
                 towers[x].add(value)
@@ -68,7 +68,7 @@ class RingState {
      * @param soln - The legal states
      * @return - Steps
      */
-    fun solve(depth: Int, prev: MutableSet<CannibalState?>, soln: MutableList<CannibalState?>): List<CannibalState?>? {
+    fun solve(depth: Int, prev: MutableSet<RingState>, soln: MutableList<RingState>): List<RingState>? {
         var depth = depth
         if (depth > MAX_DEPTH) return null
         depth += 1
@@ -79,7 +79,7 @@ class RingState {
         for (state in getNextStates()) {
             if (prev.contains(state)) continue
             prev.add(state)
-            val solve: List<CannibalState> = state.solve(depth, prev, soln)
+            val solve: List<RingState>? = state.solve(depth, prev, soln)
             if (solve != null) {
                 soln.add(this)
                 return soln
@@ -89,34 +89,47 @@ class RingState {
     }
 
     /**
-     * Determines if there are 3 missionaries & 3 cannibals on the right side
+     * Determines if every tower except for the last tower is empty
      *
      * @return - The state is the end state
      */
     fun isEnd(): Boolean {
-        return leftMissionaries == 0 && leftCannibals == 0
+        for(i in 0 until (towers.size-1)) {
+            val tower = towers[i]
+            if(tower.isNotEmpty()) return false
+        }
+
+        return true
     }
 
     /**
-     * Determines if the missionaries outweigh
-     * or are equal to the cannibals on each side to ensure that they do not get eaten
+     * Ensures that there are no higher integers above lower integers in the same tower
      *
      * @return - The state is legal
      */
     fun isLegal(): Boolean {
-        if (!(this.leftCannibals >= 0 && this.leftMissionaries >= 0 && this.rightCannibals >= 0 && this.rightMissionaries >= 0)) return false
-        if (this.leftCannibals > this.leftMissionaries &&
-                this.leftMissionaries > 0) return false
-        return if (this.rightCannibals > this.rightMissionaries &&
-                this.rightMissionaries > 0) false else true
+        var legal = true
+
+        for(tower in towers) {
+            var prevVal = 0
+            // the previous value should always be less
+            for(value in tower) {
+                if(value > prevVal) return false
+                prevVal = value
+            }
+        }
+
+        return legal
     }
 
-    override fun toString(): String? {
-        return String.format("%s/%s || %s/%s",
-                leftMissionaries,
-                leftCannibals,
-                rightMissionaries,
-                rightCannibals)
+    override fun toString(): String {
+        var string = ""
+
+        for(tower in towers) {
+            println(tower.joinToString(", "))
+        }
+
+        return string
     }
 
     override fun equals(other: Any?): Boolean {
