@@ -1,6 +1,5 @@
 package me.tyler.hanoi
 
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
@@ -53,8 +52,10 @@ class RingState {
                 towers[x].add(value)
 
                 val next = RingState(towers)
-                if(next.isLegal())
+                if(next.isLegal()) {
+                    println(next)
                     states.add(next)
+                }
             }
         }
 
@@ -74,6 +75,7 @@ class RingState {
         depth += 1
         if (isEnd()) {
             soln.add(this)
+            println("this is the end")
             return soln
         }
         for (state in getNextStates()) {
@@ -85,6 +87,7 @@ class RingState {
                 return soln
             }
         }
+
         return null
     }
 
@@ -114,7 +117,7 @@ class RingState {
             var prevVal = 0
             // the previous value should always be less
             for(value in tower) {
-                if(value > prevVal) return false
+                if(value < prevVal) return false
                 prevVal = value
             }
         }
@@ -126,7 +129,7 @@ class RingState {
         var string = ""
 
         for(tower in towers) {
-            println(tower.joinToString(", "))
+           string += tower.joinToString(", ") + " | "
         }
 
         return string
